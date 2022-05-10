@@ -432,4 +432,57 @@ lastal -v -P48 -Qkeep -C2 genome_last/hg38_tRNAs/GRCh38_plus_tRNAs.last ./IN_fqg
 
 MAF format has a 0-based numbering scheme for positions
 
+### getting tRNA contig matches with counts
+
+From a given ```*.maf.gz``` file extract the aligment lines containing names (=> ripgrep patterns) specified in 
+the file: ```meta_data/trna_names_short.with_s.txt```
+
+**Caveat**
+1. contains data for all tRNA contigs with matches, including 
+* mitochondrial tRNAs
+* Pseudo_tRNAs 
+* SeC(e)_tRNA, SeC_tRNA, Sup_tRNA, Undet_tRNA
+
+```
+count	seq_name	match_start	match_end	seq_len	match_seq
+14	Ala_tRNA::11:50274707-50274779(-)	1	26	72	GGGGGTGTAGCTCAGTGGTAGAGCGG
+1	Ala_tRNA::11:50274707-50274779(-)	1	40	72	GGGGGTGTAGCTCAGTGGTAGAGCGGATGCTTTGCATGTA
+1	Ala_tRNA::12:124939965-124940037(+)	1	37	72	GGGGATGTAGCTCAGTGGTAGAGCGCATGCTTTGCAC
+17	Ala_tRNA::12:124939965-124940037(+)	1	40	72	GGGGATGTAGCTCAGTGGTAGAGCGCATGCTTTGCACGTA
+21	Ala_tRNA::12:124939965-124940037(+)	1	41	72	GGGGATGTAGCTCAGTGGTAGAGCGCATGCTTTGCACGTAT
+
+```
+
+* python batch script ```src/batch_extract_tRNA_mappings_maf.py```
+* example SLURM script
+
+```
+dkedra@login2 /s/d/p/t/m/m/n/test_concat> more rg_trna_D_1.clump_opt_dedup.fastp.lastal.hg38-tRNAs.sh 
+#!/bin/bash
+
+#SBATCH --nodes=1
+#SBATCH --time=00:50:00
+#SBATCH --cpus-per-task=4
+#SBATCH --partition=express
+
+#SBATCH --job-name=rg_trna_D_1.clump_opt_dedup.fastp.lastal.hg38-tRNAs
+
+module load gcc/11.2.0 
+
+export PATH=/scratch/dkedra/soft/bin:$PATH
+
+
+cp header.txt.gz .//D_1.clump_opt_dedup.fastp.lastal.hg38-tRNAs.trna.frag_cnt.tsv.gz
+
+rg -z --threads 4 -f /scratch/dkedra/proj/trna_20220426/mapping/trna_names_short.with_s.txt ./D_1.clump_opt_dedup.fastp.lastal.hg38-tRNAs.maf.gz \
+| awk '{print $2, $3+1, $3+$4, $6, $7}' \
+| sort | uniq -c |  tr --squeeze-repeats " " \
+| sed 's/ /\t/g' | sed -e 's/^\t//g' 
+| gzip >> .//D_1.clump_opt_dedup.fastp.lastal.hg38-tRNAs.trna.frag_cnt.tsv.gz 
+
+
+```
+
+
+
 
