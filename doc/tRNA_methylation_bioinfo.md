@@ -480,9 +480,146 @@ rg -z --threads 4 -f /scratch/dkedra/proj/trna_20220426/mapping/trna_names_short
 | sed 's/ /\t/g' | sed -e 's/^\t//g' 
 | gzip >> .//D_1.clump_opt_dedup.fastp.lastal.hg38-tRNAs.trna.frag_cnt.tsv.gz 
 
+```
+
+
+## priority tRNA set processing
+
+### extract priority tRNAs
+
+Get the aligments for a subset of tRNAs specified in ```meta_data/priority_matches_01.txt```
+
+
+* preprocessing/selection
+
+fish shell command 
+
+
+```
+for fn in *.maf.gz 
+    rg -z -A 1 -f priority_matches.txt $fn | gzip > (basename $fn .maf.gz).priority.align.gz
+end
+```
+
+* output format
+
+```
+s Val_tRNA::3:169772229-169772302(+)        0 35 + 73 GTTTCCGTAGTGTAGTGGTTATCACGTTCGCCTAA
+s SND00105:1227:CCV44ANXX:4:2309:7593:87815 4 35 + 51 GTTTCCGTAGTGTAGTGGTTATCAAGTTCGCCTAA
+--
+s Val_tRNA::3:169772229-169772302(+)         0 35 + 73 GTTTCCGTAGTGTAGTGGTTATCACGTTCGCCTAA
+s SND00105:1227:CCV44ANXX:4:2209:13167:79726 4 35 + 51 GTTTCCGTAGTGTAGTGGTTATCAAGTTCGCCTAA
+--
+```
+
+* convert subset of maf to fasta
+
+* script: ```src/maf_2_fa_with_counts.py```
+
+* command (fish)
+
+```
+for fn in *align
+    echo $fn
+    ./parse_maf_trna_alignments.py $fn > (basename $fn .align).align.10count.fa
+end
 
 ```
 
 
+* example output
 
+```
+>Ala_tRNA::12:124939965-124940037(+)_46_73_count747
+CCCCGGGTTCAATCCCCGGCATCTCCA
+>Ile_tRNA::6:26554121-26554195(+)_48_75_count1149
+TCGCGGGTTCGATCCCCGTACGGGCCA
+>Ala_tRNA::6:26553502-26553574(+)_45_73_count470
+GTCCCGGGTTCGATCCCCGGCATCTCCA
+>Ala_tRNA::6:26553502-26553574(+)_46_73_count3559
+TCCCGGGTTCGATCCCCGGCATCTCCA
+```
+
+
+## tRNA position numbering
+
+The canonical numebring scheme is based on the aligments from:
+http://gtrnadb.ucsc.edu/genomes/eukaryota/Hsapi38/Hsapi38-align.html
+
+
+### html to STOCKHOLM aligment format
+
+Above html was transformed to text and then to Stockholm aligment format in a following way:
+
+* text processing from html to 2 colum aligments
+
+```
+
+wget --output-document=gtrna_align.raw.html  http://gtrnadb.ucsc.edu/genomes/eukaryota/Hsapi38/Hsapi38-align.html
+
+sed 's/<span ID=b.>//g' gtrna_align.raw.html |sed 's/<span ID=b..>//g' | sed 's/<\/span>//g' | rg -v ">>" | rg -v '^<' | sed 's/<a name//g' | sed 's/><\/a>//g' | tr -d '=' > gtrna_align.ver1.txt
+
+# create file with desired tRNA names to filter aligments
+rg -v 'tRNA covariance' gtrna_align.ver1.txt | choose 1 | rg '^tRNA' | choose -c ..12 | rg -v 'Und|SeC|Sup|iMet' | sort | uniq > gtrna_isotypes_names.51.txt
+
+# extract the lines with relevant tRNA isotypes 
+rg -f gtrna_isotypes_names.51.txt gtrna_align.ver1.txt | rg -v filtered | choose ..2 > gtrna_align.isotypes.51.2cols
+```
+This gives a 2 column file ```gtrna_align.isotypes.51.2cols``` with 422 lines
+
+* alternative more inclusive set
+```
+rg -v '^[\t," "]' gtrna_align.ver1.txt | rg -v 'filtered' | rg 'tRNA-' | choose ..2 >  gtrna_align.isotypes.all.2cols
+
+```
+
+output: ```gtrna_align.isotypes.all.2cols``` has 433 lines.
+
+
+* from 2 column aligment to stockholm
+
+```
+# canonical 51 set:
+./convert-gtrna_to_stockh.py gtrna_align.isotypes.51.2cols > gtrna_align.isotypes.51.sto
+
+# alternative all
+./convert-gtrna_to_stockh.py gtrna_align.isotypes.all.2cols > gtrna_align.isotypes.all.sto
+
+```
+
+
+### inferal for database of profiles
+
+* create a ```.cm``` file using ```cmbuild```
+```
+# canonical 51 set:
+cmbuild --noss -F gtrna_align.isotypes.51.cm  gtrna_align.isotypes.51.sto
+
+# alternative all
+cmbuild --noss -F gtrna_align.isotypes.all.cm  gtrna_align.isotypes.all.sto
+```
+
+* calibrate profiles using ```cmcalibrate```
+
+**Caveat** 
+
+This is time/CPU intensive step. Takes about 1.5-2mins per aligment on Ryzen 7 with 16 threads. 
+
+```
+# canonical 51 set:
+cmcalibrate gtrna_align.isotypes.51.cm
+
+# alternative all
+cmcalibrate gtrna_align.isotypes.all.cm 
+```
+
+* convert to cmsearch compatible db with ```cmpress```
+
+```
+# canonical 51 set:
+cmpress gtrna_align.isotypes.51.sto
+
+# alternative all
+cmpress gtrna_align.isotypes.all.cm
+```
 
