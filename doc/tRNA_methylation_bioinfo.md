@@ -190,6 +190,18 @@ pigz -8 GRCh38_plus_tRNAs.fa
 
 ## mapping
 
+Used LAST mapper 
+
+* www:  https://gitlab.com/mcfrith/last
+* version: 1281 
+* installation: compiled from source
+
+```
+module load gcc/11.2.0
+make 
+```
+
+
 ### create genomic index
 
 * unpack
@@ -229,16 +241,9 @@ ls -l *fastq.gz
 # output
 -r--r--r-- 1 darked darked 421363708 Apr 25 16:25 D_1.fastq.gz
 -r--r--r-- 1 darked darked 442198262 Apr 25 16:25 D_BH4_1.fastq.gz
--r--r--r-- 1 darked darked 318421527 Apr 25 16:24 KO6M_1_1.fastq.gz
--r--r--r-- 1 darked darked 363724791 Apr 25 16:24 KO6M_2_1.fastq.gz
--r--r--r-- 1 darked darked 378515297 Apr 25 16:23 KO6M_3_1.fastq.gz
--rw-r--r-- 1 darked darked 391489072 Apr 26 13:15 KO6M_4_1.fastq.gz
+
 -rw-r--r-- 1 darked darked 458572848 Apr 26 13:16 NoD_1.fastq.gz
 -r--r--r-- 1 darked darked 410977493 Apr 25 15:31 NoD_BH4_1.fastq.gz
--r--r--r-- 1 darked darked 391744579 Apr 25 15:30 WT6M_1_1.fastq.gz
--r--r--r-- 1 darked darked 603965167 Apr 25 16:08 WT6M_2_1.fastq.gz
--r--r--r-- 1 darked darked 434950525 Apr 25 16:07 WT6M_3_1.fastq.gz
--r--r--r-- 1 darked darked 481868553 Apr 25 15:29 WT6M_4_1.fastq.gz
 ```
 
 * md5 checksums
@@ -250,16 +255,8 @@ md5sum *fastq.gz
 # result
 bb2c0c03a31c47077b4136b599374f51  D_1.fastq.gz
 ec37b58216ecc8958df2b4e876133762  D_BH4_1.fastq.gz
-af5c9a9537fcb9c05187a27afbf56757  KO6M_1_1.fastq.gz
-cb51a4e81889fd6f81506eec8608ebdf  KO6M_2_1.fastq.gz
-6b9d57d51f9e939056f5cebe56aa4c6e  KO6M_3_1.fastq.gz
-1b6bb9fcaed937f0664fc8808987386c  KO6M_4_1.fastq.gz
 68ecdb9735be757c7d53cb556e5258fa  NoD_1.fastq.gz
 f8d3140c32e32b7df4888f9697de9923  NoD_BH4_1.fastq.gz
-aba6ed4ec506bc5bc74d8f751fe5cfc5  WT6M_1_1.fastq.gz
-1a7ba3c55167587bd9886e691da7e5a3  WT6M_2_1.fastq.gz
-d9d8ec2311039e266210366519893d52  WT6M_3_1.fastq.gz
-726ac3f7e73d09195f59ac9bf2804c1d  WT6M_4_1.fastq.gz
 ```
 
 * location on HPC cluster
@@ -270,7 +267,12 @@ d9d8ec2311039e266210366519893d52  WT6M_3_1.fastq.gz
 
 ### clustering and low complexity filter
 
-To shrink size and speed up subsequent processing of the fastq data used clumpify.sh from bbmap ver 38.96
+To shrink size and speed up subsequent processing of the fastq data used clumpify.sh from BBMap 
+
+* program: 
+* source: https://sourceforge.net/projects/bbmap/
+* version: 38.96
+* installed: download from the abowe www and unpack
 
 example SLURM shell script:
 
@@ -314,9 +316,18 @@ Python script for SLURM scripts creation:
 
 ### quality check and optical replicates filtering
 
-Used ```fastp``` (installed using conda) for that task.
+* program ```fastp``` 
+* version: 0.23.2
+* installed using: conda
+* install procedure:
 
-Example SLURM submission script:
+```
+conda create --name fastp
+conda activate fastp
+conda install -c bioconda fastp
+```
+
+* example SLURM submission script:
 
 ```
 #!/bin/bash
@@ -353,4 +364,72 @@ Python script for SLURM scripts creation:
 
 ./batch_fastp.py
 ```
+
+### optional step: fqgrep primer masking
+
+In order to improve mappings/not include primer derived base(s) i.e. at the matches ends we masked the primer sequences in the fastq files.
+
+* program used: https://github.com/indraniel/fqgrep
+
+* example SLURM script to create fqgrep report
+
+```
+#!/bin/bash
+
+#SBATCH --nodes=1
+#SBATCH --time=00:59:00
+#SBATCH --cpus-per-task=1
+#SBATCH --partition=express
+
+#SBATCH --job-name=job_name
+
+module load gcc/11.2.0 
+
+export LD_LIBRARY_PATH=/scratch/dkedra/soft/lib:$LD_LIBRARY_PATH
+export PATH=/scratch/dkedra/soft/bin:$PATH
+
+
+fqgrep -r -a -e -p 'TGGAATTCTCGGGTGCCAAGGC|TGGAATTCTCGGGTGCCAAGG|TGGAATTCTCGGGTGCCAAG|TGGAATTCTCGGGTGCCAA|TGGAATTCTCGGGTGCCA|GTTCAGAGTTCTACAGTCCGACGATC|GTTCAGAGTTCTACAGTCCGACGAT|GTTCAGAGTTCTACAGTCCGACGA|GTTCAGAGTTCTACAGTCCGACG|GTTCAGAGTTCTACAGTCCGA
+C|GCCTTGGCACCCGAGAATTCCA|GATCGTCGGACTGTAGAACTCTGAAC' -o ./FQGREP_20220426/D_1.clump_opt_dedup.fastp.fqgrep_report_pat2.out  ./FASTP_20220426/D_1.clump_opt_dedup.fastp.fq.gz
+```
+
+* python script to create shell scripts for slurm
+
+batch_fqgrep.py
+
+* python/pypy script to re-create fastq files from fqgrep report
+
+```src/parse_fqgrep_report.py```
+
+
+
+### mapping with lastal
+
+* example SLURM shell code
+
+```
+#!/bin/bash
+
+#SBATCH --nodes=1
+#SBATCH --time=02:00:00
+#SBATCH --cpus-per-task=48
+#SBATCH --partition=mem
+
+#SBATCH --job-name=lastal_D_1.clump_opt_dedup.fastp.fqgrep_mask
+
+module load gcc/11.2.0 
+
+export PATH=/scratch/dkedra/soft/bin:$PATH
+
+
+lastal -v -P48 -Qkeep -C2 genome_last/hg38_tRNAs/GRCh38_plus_tRNAs.last ./IN_fqgrep/D_1.clump_opt_dedup.fastp.fqgrep_mask.fq.gz | last-split | gzip > ./D_1.clump_opt_dedup.fastp.fqgrep_mask.lastal.hg38-tRNAs.maf.gz 
+
+```
+
+## parsing MAF format files 
+
+**Caveat** 
+
+MAF format has a 0-based numbering scheme for positions
+
 
