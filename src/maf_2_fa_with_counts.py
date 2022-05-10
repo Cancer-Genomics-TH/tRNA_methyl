@@ -25,7 +25,7 @@ with open(in_fn) as f:
             line = line.strip()
             sl = line[2:].split()
             seq_name = sl[0]
-            #print(seq_name)
+            # print(seq_name)
             if seq_name[4:8] == "tRNA":
                 trna_id = seq_name
                 match_start = int(sl[1]) + 1
@@ -33,14 +33,14 @@ with open(in_fn) as f:
                 match_name = f"{trna_id}_{match_start}_{match_end}"
             else:
                 sequence = sl[-1]
-                sequence = sequence.replace("-","")
+                sequence = sequence.replace("-", "")
                 if match_name not in sequence_frequency_dict.keys():
                     sequence_frequency_dict[match_name] = [1, sequence]
                 else:
                     sequence_frequency_dict[match_name][0] += 1
-                #print(f"{match_name}\t{sequence}")
+                # print(f"{match_name}\t{sequence}")
 
-#print(sequence_frequency_dict)
+# print(sequence_frequency_dict)
 
 for key, value in sequence_frequency_dict.items():
     matches_count = value[0]

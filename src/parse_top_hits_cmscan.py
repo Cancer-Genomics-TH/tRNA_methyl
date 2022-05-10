@@ -2,7 +2,6 @@
 
 import sys
 
-
 in_fn = sys.argv[1]
 
 
@@ -12,7 +11,7 @@ with open(in_fn) as f:
         line = line.strip()
 
         if line[0] == "#":
-            #print(line)
+            # print(line)
             pass
         else:
             sl = line.split()
@@ -23,4 +22,3 @@ with open(in_fn) as f:
             if query_id != old_query_id:
                 print(line)
             old_query_id = query_id
-

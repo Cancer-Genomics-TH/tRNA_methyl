@@ -17,13 +17,15 @@ input_dir = "./"
 out_dir = "./"
 
 
-
-
-trna_names_4rg = "/scratch/dkedra/proj/trna_20220426/mapping/trna_names_short.with_s.txt"
+trna_names_4rg = (
+    "/scratch/dkedra/proj/trna_20220426/mapping/trna_names_short.with_s.txt"
+)
 
 input_fn_pattern_1 = "*.maf.gz"
 
-patterns = [input_fn_pattern_1, ]
+patterns = [
+    input_fn_pattern_1,
+]
 
 num_of_threads = 4
 
@@ -61,8 +63,8 @@ for pattern in patterns:
         print(f"#SBATCH --job-name={job_name}")
         print(env_setup)
 
-        # extracts aligned lines for the tRNA contigs 
-        # prints tRNA_name, match_start(+1 because MAF is zero based), match_end, 
+        # extracts aligned lines for the tRNA contigs
+        # prints tRNA_name, match_start(+1 because MAF is zero based), match_end,
         # adding header
         command_1 = f"cp header.txt.gz {out_trna_tsv_fn}"
 
@@ -70,8 +72,8 @@ for pattern in patterns:
         """
 
         command_1 = command_1.replace(8 * " ", "")
-        command_2 = command_2.replace(8 * " ", "") 
-        
+        command_2 = command_2.replace(8 * " ", "")
+
         print(command_1)
         print()
         print(command_2)
