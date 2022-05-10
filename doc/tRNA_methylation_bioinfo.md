@@ -590,7 +590,7 @@ output: ```gtrna_align.isotypes.all.2cols``` has 433 lines.
 
 ### inferal for database of profiles
 
-* create a ```.cm``` file using ```cmbuild```
+#### create a ```.cm``` file using ```cmbuild```
 ```
 # canonical 51 set:
 cmbuild --noss -F gtrna_align.isotypes.51.cm  gtrna_align.isotypes.51.sto
@@ -599,7 +599,7 @@ cmbuild --noss -F gtrna_align.isotypes.51.cm  gtrna_align.isotypes.51.sto
 cmbuild --noss -F gtrna_align.isotypes.all.cm  gtrna_align.isotypes.all.sto
 ```
 
-* calibrate profiles using ```cmcalibrate```
+#### calibrate profiles using ```cmcalibrate```
 
 **Caveat** 
 
@@ -613,7 +613,7 @@ cmcalibrate gtrna_align.isotypes.51.cm
 cmcalibrate gtrna_align.isotypes.all.cm 
 ```
 
-* convert to cmsearch compatible db with ```cmpress```
+#### convert to cmsearch compatible db with ```cmpress```
 
 ```
 # canonical 51 set:
@@ -621,5 +621,25 @@ cmpress gtrna_align.isotypes.51.sto
 
 # alternative all
 cmpress gtrna_align.isotypes.all.cm
+```
+
+#### search profiles with filetered read matches 
+
+* example command
+
+```
+cmscan -o D_1.clump_opt_dedup.fastp.lastal.hg38-tRNAs.priority.align.cmscan_tmp  --tblout D_1.clump_opt_dedup.fastp.lastal.hg38-tRNAs.priority.align.10count.cmscan_51_out ../gtrna_align.isotypes.51.cm  D_1.clump_opt_dedup.fastp.lastal.hg38-tRNAs.priority.align.10count.fa
+```
+
+#### pre-parse cmscan tabular output
+
+Because the cmscan reports by default not just top hits for a given query the output needs to be pre-parsed to get just the top hit
+
+* script: ```src/parse_top_hits_cmscan.py```
+
+* example command
+
+```
+./parse_top_hits_cmscan.py D_1.clump_opt_dedup.fastp.lastal.hg38-tRNAs.priority.align.10count.cmscan51_out | sort >  D_1.clump_opt_dedup.fastp.lastal.hg38-tRNAs.priority.align.10count.cmscan51_out.top_hits
 ```
 
