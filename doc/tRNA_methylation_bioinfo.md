@@ -615,11 +615,13 @@ cmbuild --noss -F gtrna_align.isotypes.all.cm  gtrna_align.isotypes.all.sto
 
 **Caveat** 
 
-This is time/CPU intensive step. Takes about 1.5-2mins per aligment on Ryzen 7 with 16 threads. 
+This is time/CPU intensive step. Takes about 1.5-2mins per aligment on Ryzen 7 with 16 threads.
+On mem machines with 48 threads calibrating one aligment requires 20-30s.  
+
 
 ```
 # canonical 51 set:
-cmcalibrate gtrna_align.isotypes.51.cm
+cmcalibrate --gtrna_align.isotypes.51.cm
 
 # alternative all
 cmcalibrate gtrna_align.isotypes.all.cm 
@@ -629,10 +631,10 @@ cmcalibrate gtrna_align.isotypes.all.cm
 
 ```
 # canonical 51 set:
-cmpress gtrna_align.isotypes.51.sto
+cmpress --cpu gtrna_align.isotypes.51.sto
 
 # alternative all
-cmpress gtrna_align.isotypes.all.cm
+cmpress --cpu gtrna_align.isotypes.all.cm
 ```
 
 #### search profiles with filetered read matches 
