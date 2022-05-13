@@ -482,6 +482,18 @@ rg -z --threads 4 -f /scratch/dkedra/proj/trna_20220426/mapping/trna_names_short
 
 ```
 
+### getting two aligment lines (tRNA contig and sequencing read matches) 
+
+**Note**
+Using ```pigz``` instead of ripgrep's ```rg -z``` is faster. 
+In fish shell
+```
+for fn in *maf.gz 
+    pigz --stdout -d $fn | rg -A1 --no-context-separator  -f ../../trna_names_short.with_s.txt |  choose --character-wise 2.. > (basename $fn .maf.gz).trna_matches.2lines
+end
+```
+
+
 
 ## priority tRNA set processing
 
