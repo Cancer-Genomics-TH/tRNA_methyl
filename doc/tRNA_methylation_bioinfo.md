@@ -618,32 +618,79 @@ cmbuild --noss -F gtrna_align.isotypes.all.cm  gtrna_align.isotypes.all.sto
 This is time/CPU intensive step. Takes about 1.5-2mins per aligment on Ryzen 7 with 16 threads.
 On mem machines with 48 threads calibrating one aligment requires 20-30s.  
 
+* example commands
 
 ```
 # canonical 51 set:
-cmcalibrate --gtrna_align.isotypes.51.cm
+cmcalibrate --cpu 48 --gtrna_align.isotypes.51.cm
 
 # alternative all
-cmcalibrate gtrna_align.isotypes.all.cm 
+cmcalibrate --cpu 48 gtrna_align.isotypes.all.cm 
 ```
+
+* SLURM script for mem partition
+
+```
+#!/bin/bash
+
+#SBATCH --nodes=1
+#SBATCH --time=04:00:00
+#SBATCH --cpus-per-task=48
+#SBATCH --partition=mem
+
+module load conda
+
+conda activate infernal
+
+
+cmcalibrate --cpu 48 gtrna_align.isotypes.all.cm 
+
+```
+
 
 #### convert to cmsearch compatible db with ```cmpress```
 
+This works in seconds:
+
 ```
 # canonical 51 set:
-cmpress --cpu gtrna_align.isotypes.51.sto
+cmpress gtrna_align.isotypes.51.sto
 
 # alternative all
-cmpress --cpu gtrna_align.isotypes.all.cm
+cmpress gtrna_align.isotypes.all.cm
+```
+
+* output example:
+
+```
+-rw-r--r-- 1 dkedra ubbiomed  625734 May 16 11:54 gtrna_align.isotypes.all.cm.i1p
+-rw-r--r-- 1 dkedra ubbiomed 1753630 May 16 11:54 gtrna_align.isotypes.all.cm.i1m
+-rw-r--r-- 1 dkedra ubbiomed    2082 May 16 11:54 gtrna_align.isotypes.all.cm.i1i
+-rw-r--r-- 1 dkedra ubbiomed  399759 May 16 11:54 gtrna_align.isotypes.all.cm.i1f
+
+
 ```
 
 #### search profiles with filetered read matches 
+
+One can speed up cmscan using ```--cpu {num_of_threads}``` 
+
 
 * example command
 
 ```
 cmscan -o D_1.clump_opt_dedup.fastp.lastal.hg38-tRNAs.priority.align.cmscan_tmp  --tblout D_1.clump_opt_dedup.fastp.lastal.hg38-tRNAs.priority.align.10count.cmscan_51_out ../gtrna_align.isotypes.51.cm  D_1.clump_opt_dedup.fastp.lastal.hg38-tRNAs.priority.align.10count.fa
 ```
+
+* fish command to search all 4 fasta files
+
+```
+for fn in *fa 
+    echo $fn
+    cmscan -o (basename $fn .fa).cmscan_tmp --tblout (basename $fn .fa).cmscan_isoall.out ./gtrna_align.isotypes.all.cm $fn 
+end
+```
+
 
 #### pre-parse cmscan tabular output
 
@@ -655,5 +702,17 @@ Because the cmscan reports by default not just top hits for a given query the ou
 
 ```
 ./parse_top_hits_cmscan.py D_1.clump_opt_dedup.fastp.lastal.hg38-tRNAs.priority.align.10count.cmscan51_out | sort >  D_1.clump_opt_dedup.fastp.lastal.hg38-tRNAs.priority.align.10count.cmscan51_out.top_hits
+```
+
+#### filtration of the cmscan matches
+
+There are two requirements to include fragment mappings into the final stats/ heat plot:
+
+1. each fragment was observed at least 10x in the LAST aligner mappings per fastq file
+2. the cmscan E-value <= 1e-04
+
+```
+min_count = 10
+min_score = 1e-04
 ```
 
