@@ -13,6 +13,7 @@ the sequence is from the NGS read match (gaps introduced during the mapping are 
 
 
 import sys
+import string
 
 in_fn = sys.argv[1]
 
@@ -21,12 +22,13 @@ sequence_frequency_dict = {}
 with open(in_fn) as f:
     old_trna_id = ""
     for line in f:
-        if line[0] == "s":
+        if line[0] in string.ascii_letters:
             line = line.strip()
-            sl = line[2:].split()
+            sl = line.split()
             seq_name = sl[0]
-            # print(seq_name)
-            if seq_name[4:8] == "tRNA":
+            #print(seq_name)
+            # SND is a prefix for the fastq flow cell/read ids
+            if seq_name[:3] != "SND": 
                 trna_id = seq_name
                 match_start = int(sl[1]) + 1
                 match_end = match_start + int(sl[2])
@@ -38,13 +40,13 @@ with open(in_fn) as f:
                     sequence_frequency_dict[match_name] = [1, sequence]
                 else:
                     sequence_frequency_dict[match_name][0] += 1
-                # print(f"{match_name}\t{sequence}")
+                #print(f"{match_name}\t{sequence}")
 
 # print(sequence_frequency_dict)
 
 for key, value in sequence_frequency_dict.items():
     matches_count = value[0]
-    if matches_count > 9:
+    if matches_count >= 1:
         fasta_name = f">{key}_count{value[0]}"
         seq = value[1]
         print(fasta_name)
