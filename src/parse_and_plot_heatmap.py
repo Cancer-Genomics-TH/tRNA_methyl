@@ -3,6 +3,7 @@
 import glob
 import pickle
 import pprint
+import random
 from collections import namedtuple
 
 import matplotlib.pyplot as plt
@@ -54,11 +55,16 @@ def seaborn_heatmap(numpy_file_matrix, isotypes_list, in_fn):
     df = pd.DataFrame(numpy_file_matrix)
     df.index = isotypes_list
     fig, ax = plt.subplots()
-    # sns.heatmap(df, cmap='viridis')
+    sns.heatmap(df, cmap="Reds", linewidth=1, linecolor="w", square=True)
     # "rocket"mako
-    sns.heatmap(df, cmap="crest")
+    # my_cmap = sns.dark_palette("Reds", as_cmap=True)
+    # my_cmap = sns.diverging_palette(240, 10, n=10, as_cmap=True)
+    # sns.heatmap(df, cmap=my_cmap)
+
     # plt.yticks = isotypes_list
-    ax.set_yticks(range(0, len(isotypes_list)), labels=isotypes_list)
+    ax.set_yticks(
+        range(0, len(isotypes_list)), labels=isotypes_list, fontname="monospace"
+    )
     ax.set_xticks(range(0, 105), labels=range(1, 105 + 1))
     ax.set_title(f"data from {title}")
     ###plt.set_yticklabels(isotypes_list)
@@ -93,12 +99,15 @@ def normalize_isotype_data(isotype_data_input, isotype):
 
     for position in range(1, last_coverage_pos + 1):
         if coverage_dict[position] > 0:
-            # coverage_dict[position] =  100 * last_coverage_pos * (coverage_dict[position] / total_coverage_sum)
             coverage_dict[position] = (
-                1000
-                * coverage_dict[position]
-                / (last_coverage_pos * total_coverage_sum)
+                1000 * coverage_dict[position] / total_coverage_sum
             )
+            # coverage_dict[position] = (
+            #    1000
+            #    * coverage_dict[position]
+            #    / (last_coverage_pos * total_coverage_sum)
+            # )
+
         if end_points_dict[position] > 0:
             end_points_dict[position] = (
                 1000
@@ -107,13 +116,20 @@ def normalize_isotype_data(isotype_data_input, isotype):
             )
             # end_points_dict[position] = 100 * last_coverage_pos * (end_points_dict[position] / total_coverage_sum)
     if last_coverage_pos < max_match_position:
-        """
-        for  position in range(last_coverage_pos+1,max_match_position+1 ):
+        for position in range(last_coverage_pos + 1, max_match_position + 1):
             end_points_dict[position] = np.nan
             coverage_dict[position] = np.nan
-        """
 
-    ##print("debug coverage_dict")
+    isoform_annot_list = []
+    for position in range(0, last_coverage_pos):
+        random_base = random.choice(["a", "c", "t", "G"])
+        if random_base in ["a", "G"]:
+            isoform_annot_list.append(random_base)
+        else:
+            isoform_annot_list.append("")
+
+    print(isoform_annot_list)
+    print("debug coverage_dict")
     pp.pprint(coverage_dict)
     ##print("debug end_points_dict")
     pp.pprint(end_points_dict)
@@ -202,6 +218,3 @@ for in_fn in glob.glob(glob_pattern):
 
 # pp.pprint(samples_dict)
 # print(samples_dict)
-
-
-
