@@ -31,7 +31,8 @@ Isotype_data = namedtuple("Isotype_data", "coverage end_points")
 def seaborn_heatmap(numpy_file_matrix, isotypes_list, in_fn):
     """FIXME"""
     title_data = in_fn.split(".")[0]
-    title = f"{title_data} heatplot of coverage (normalized by tRNA isotype mappings)"
+    title = f"Normalized Coverage Heat Plot of {title_data}"
+    ## (normalized by tRNA isotype mappings)"
 
     df = pd.DataFrame(numpy_file_matrix)
     df.index = isotypes_list
@@ -45,11 +46,22 @@ def seaborn_heatmap(numpy_file_matrix, isotypes_list, in_fn):
         range(0, len(isotypes_list)), labels=isotypes_list, fontname="monospace"
     )
     ax.set_xticks(range(0, 105), labels=range(1, 105 + 1))
-    ax.set_title(f"data from {title}")
+
+    ax.set_xlabel('tRNA positions')
+    ax.set_ylabel('isoforms')
+
+    # heatmap.subplots_adjust(top=.8)
+    # FIXME: check https://www.statology.org/seaborn-title/
+    ax.set_title(f"{title}")
+    #plt.text(x=4.7, y=4.7, s='Coverage Heat Plot', fontsize=16, weight='bold')
+    #plt.text(x=4.7, y=4.6, s=f'{in_fn}', fontsize=8, alpha=0.75)
+
+    
     # plt.set_yticklabels(isotypes_list)
     plt.show()
     # FIXME: check the resolution
-    # plt.savefig(f"heatmap_coverage_{title_data}.png", format = "png", dpi=1200)
+    # PNGs or as below SVGs with plots are not OK 
+    # plt.savefig(f"heatmap_coverage_{title_data}.svg", format = "svg")
     # plt.close(fig)
 
 
@@ -113,10 +125,10 @@ def parse_single_file(in_fn, symbol):
                     isoforms_dict[isotype_cmscan] = Isotype_data({}, {})
                     for i in range(1, MAX_MATCH_POSITION + 1):
                         isoforms_dict[isotype_cmscan].coverage[i] = 0
-                        isoforms_dict[isotype_cmscan].end_points[i] = 0
+                        #isoforms_dict[isotype_cmscan].end_points[i] = 0
 
-                isoforms_dict[isotype_cmscan].end_points[match_start] += fragment_count
-                isoforms_dict[isotype_cmscan].end_points[match_end] += fragment_count
+                #isoforms_dict[isotype_cmscan].end_points[match_start] += fragment_count
+                #isoforms_dict[isotype_cmscan].end_points[match_end] += fragment_count
 
                 for position in range(match_start, match_end + 1):
                     isoforms_dict[isotype_cmscan].coverage[position] += fragment_count
@@ -197,7 +209,9 @@ if __name__ == "__main__":
     # get the tRNA idoforms sizes
     with open(PICKLE_FN, "rb") as f:
         trna_sizes_dict = pickle.load(f)
-
+    
+    isoform_sizes_sorted = sorted(trna_sizes_dict.items(), key=lambda x: x[1])
+    #pp.pprint(test_sizes)
     log.debug(trna_sizes_dict)
 
     process_files(GLOB_PATTERN)
