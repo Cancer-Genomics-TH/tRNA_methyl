@@ -125,10 +125,7 @@ def parse_single_file(in_fn, symbol):
                     isoforms_dict[isotype_cmscan] = Isotype_data({}, {})
                     for i in range(1, MAX_MATCH_POSITION + 1):
                         isoforms_dict[isotype_cmscan].coverage[i] = 0
-                        #isoforms_dict[isotype_cmscan].end_points[i] = 0
-
-                #isoforms_dict[isotype_cmscan].end_points[match_start] += fragment_count
-                #isoforms_dict[isotype_cmscan].end_points[match_end] += fragment_count
+                       
 
                 for position in range(match_start, match_end + 1):
                     isoforms_dict[isotype_cmscan].coverage[position] += fragment_count
@@ -145,6 +142,12 @@ def parse_single_file(in_fn, symbol):
         numpy_file_matrix = np.zeros_like(numpy_file_matrix)
         log.info(f"""numpy_file_matrix_shape: {numpy_file_matrix.shape}""")
         log.debug(numpy_file_matrix)
+        size_sorted_isoforms_one_file_list = []
+        for sorted_tuple in isoform_sizes_sorted:
+            if sorted_tuple[0] in isotypes_one_file_list:
+                size_sorted_isoforms_one_file_list.append(sorted_tuple[0])
+
+        isotypes_one_file_list = size_sorted_isoforms_one_file_list 
         for index, isotype in enumerate(isotypes_one_file_list):
             log.debug(f"""filename: {in_fn} isotypes:""")
             log.debug(f"""{index}, {isotype}""")
