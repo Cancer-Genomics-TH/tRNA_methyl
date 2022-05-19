@@ -29,7 +29,7 @@ Isotype_data = namedtuple("Isotype_data", "coverage end_points")
 
 
 def seaborn_heatmap(numpy_file_matrix, isotypes_list, in_fn):
-
+    """FIXME"""
     title_data = in_fn.split(".")[0]
     title = f"{title_data} heatplot of coverage (normalized by tRNA isotype mappings)"
 
@@ -56,14 +56,14 @@ def seaborn_heatmap(numpy_file_matrix, isotypes_list, in_fn):
 def normalize_isotype_data(isotype_data_input, isotype):
     """FIXME"""
 
-    last_coverage_pos = max_match_position
+    last_coverage_pos = MAX_MATCH_POSITION
 
     coverage_dict = isotype_data_input.coverage
     # end_points_dict = isotype_data_input.end_points
 
     trna_isoform_coverage_vals = list(coverage_dict.values())
     total_coverage_sum = sum(trna_isoform_coverage_vals)
-    for counter in range(max_match_position, 1, -1):
+    for counter in range(MAX_MATCH_POSITION, 1, -1):
         if coverage_dict[counter] > 0:
             last_coverage_pos = counter
             break
@@ -84,11 +84,11 @@ def normalize_isotype_data(isotype_data_input, isotype):
                 1000 * coverage_dict[position] / total_coverage_sum
             )
 
-    if last_coverage_pos < max_match_position:
-        for position in range(last_coverage_pos + 1, max_match_position + 1):
+    if last_coverage_pos < MAX_MATCH_POSITION:
+        for position in range(last_coverage_pos + 1, MAX_MATCH_POSITION + 1):
             coverage_dict[position] = np.nan
 
-    log.debug(f"debug coverage_dict")
+    log.debug("debug coverage_dict")
     log.debug(coverage_dict)
 
     coverage_list = list(coverage_dict.values())
@@ -99,8 +99,8 @@ def normalize_isotype_data(isotype_data_input, isotype):
 def parse_single_file(in_fn, symbol):
     """FIXME"""
     isoforms_dict = {}
-    with open(in_fn) as f:
-        for line in f:
+    with open(in_fn) as fh:
+        for line in fh:
             line = line.strip()
             sl = line.split()
             isotype_cmscan = sl[0]
@@ -108,10 +108,10 @@ def parse_single_file(in_fn, symbol):
             match_start = int(sl[5])
             match_end = int(sl[6])
             score = float(sl[-3])
-            if (fragment_count >= min_count) and (score <= min_score):
+            if (fragment_count >= MIN_COUNT) and (score <= MIN_SCORE):
                 if isotype_cmscan not in isoforms_dict.keys():
                     isoforms_dict[isotype_cmscan] = Isotype_data({}, {})
-                    for i in range(1, max_match_position + 1):
+                    for i in range(1, MAX_MATCH_POSITION + 1):
                         isoforms_dict[isotype_cmscan].coverage[i] = 0
                         isoforms_dict[isotype_cmscan].end_points[i] = 0
 
@@ -125,10 +125,10 @@ def parse_single_file(in_fn, symbol):
         num_of_one_file_isotypes = len(isotypes_one_file_list)
 
         numpy_file_matrix = np.arange(
-            num_of_one_file_isotypes * max_match_position, dtype=float
+            num_of_one_file_isotypes * MAX_MATCH_POSITION, dtype=float
         )
         numpy_file_matrix = numpy_file_matrix.reshape(
-            num_of_one_file_isotypes, max_match_position
+            num_of_one_file_isotypes, MAX_MATCH_POSITION
         )
         numpy_file_matrix = np.zeros_like(numpy_file_matrix)
         log.info(f"""numpy_file_matrix_shape: {numpy_file_matrix.shape}""")
@@ -170,11 +170,11 @@ def process_files(glob_pattern):
 if __name__ == "__main__":
     # logging setup
     # debug_mode = False
-    debug_mode = True
+    DEBUG_MODE = True
 
     ### set the logging level ###
 
-    if debug_mode == False:
+    if DEBUG_MODE is False:
         log.basicConfig(
             level=log.INFO,
             format="%(asctime)s:%(levelname)s:%(message)s",
@@ -188,16 +188,16 @@ if __name__ == "__main__":
         )
 
     # settings
-    pickle_fn = "trna_sizes.pickle"
-    min_count = 10
-    min_score = 1e-03
-    max_match_position = 105
-    glob_pattern = "*.cmscan_isoall.top_hits.out"
+    PICKLE_FN = "trna_sizes.pickle"
+    MIN_COUNT = 10
+    MIN_SCORE = 1e-03
+    MAX_MATCH_POSITION = 105
+    GLOB_PATTERN = "*.cmscan_isoall.top_hits.out"
 
     # get the tRNA idoforms sizes
-    with open(pickle_fn, "rb") as f:
+    with open(PICKLE_FN, "rb") as f:
         trna_sizes_dict = pickle.load(f)
 
     log.debug(trna_sizes_dict)
 
-    process_files(glob_pattern)
+    process_files(GLOB_PATTERN)
