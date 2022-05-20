@@ -1,38 +1,46 @@
-- [tRNA methylation](#trna-methylation)
-  * [genome and annotation](#genome-and-annotation)
-    + [Gencode](#gencode)
-    + [ENSEMBL](#ensembl)
-    + [masking tRNAs in the genome](#masking-trnas-in-the-genome)
-    + [extracting the tRNA sequences](#extracting-the-trna-sequences)
-    + [getting uniqe sequences only](#getting-uniqe-sequences-only)
-    + [creating an artificial genome](#creating-an-artificial-genome)
-  * [mapping](#mapping)
-    + [create genomic index](#create-genomic-index)
-    + [input fastq files](#input-fastq-files)
-    + [clustering and low complexity filter](#clustering-and-low-complexity-filter)
-    + [quality check and optical replicates filtering](#quality-check-and-optical-replicates-filtering)
-    + [optional step: fqgrep primer masking](#optional-step--fqgrep-primer-masking)
-    + [mapping with lastal](#mapping-with-lastal)
-  * [parsing MAF format files](#parsing-maf-format-files)
-    + [getting tRNA contig matches with counts](#getting-trna-contig-matches-with-counts)
-    + [getting two aligment lines (tRNA contig and sequencing read matches)](#getting-two-aligment-lines--trna-contig-and-sequencing-read-matches-)
-  * [priority tRNA set processing](#priority-trna-set-processing)
-    + [extract priority tRNAs](#extract-priority-trnas)
-  * [tRNA position numbering](#trna-position-numbering)
-    + [html to STOCKHOLM aligment format](#html-to-stockholm-aligment-format)
-    + [inferal for database of profiles](#inferal-for-database-of-profiles)
-      - [create a ```.cm``` file using ```cmbuild```](#create-a----cm----file-using----cmbuild---)
-      - [calibrate profiles using ```cmcalibrate```](#calibrate-profiles-using----cmcalibrate---)
-      - [convert to cmsearch compatible db with ```cmpress```](#convert-to-cmsearch-compatible-db-with----cmpress---)
-      - [search profiles with filetered read matches](#search-profiles-with-filetered-read-matches)
-      - [pre-parse cmscan tabular output](#pre-parse-cmscan-tabular-output)
-      - [filtration of the cmscan matches](#filtration-of-the-cmscan-matches)
+
+# tRNA methylation bioinformatics
+
+- [introduction](#introduction)
+- [genome and annotation](#genome-and-annotation)
+  * [Gencode](#gencode)
+  * [ENSEMBL](#ensembl)
+  * [masking tRNAs in the genome](#masking-trnas-in-the-genome)
+  * [extracting the tRNA sequences](#extracting-the-trna-sequences)
+  * [getting uniqe sequences only](#getting-uniqe-sequences-only)
+  * [creating an artificial genome](#creating-an-artificial-genome)
+- [mapping](#mapping)
+  * [create genomic index](#create-genomic-index)
+  * [input fastq files](#input-fastq-files)
+  * [clustering and low complexity filter](#clustering-and-low-complexity-filter)
+  * [quality check and optical replicates filtering](#quality-check-and-optical-replicates-filtering)
+  * [optional step: fqgrep primer masking](#optional-step--fqgrep-primer-masking)
+  * [mapping with lastal](#mapping-with-lastal)
+- [parsing MAF format files](#parsing-maf-format-files)
+  * [getting tRNA contig matches with counts](#getting-trna-contig-matches-with-counts)
+  * [getting two aligment lines (tRNA contig and sequencing read matches)](#getting-two-aligment-lines--trna-contig-and-sequencing-read-matches-)
+- [priority tRNA set processing](#priority-trna-set-processing)
+  * [extract priority tRNAs](#extract-priority-trnas)
+- [tRNA position numbering](#trna-position-numbering)
+  * [html to STOCKHOLM aligment format](#html-to-stockholm-aligment-format)
+  * [inferal for database of profiles](#inferal-for-database-of-profiles)
+    + [create a ```.cm``` file using ```cmbuild```](#create-a----cm----file-using----cmbuild---)
+    + [calibrate profiles using ```cmcalibrate```](#calibrate-profiles-using----cmcalibrate---)
+    + [convert to cmsearch compatible db with ```cmpress```](#convert-to-cmsearch-compatible-db-with----cmpress---)
+    + [search profiles with filetered read matches](#search-profiles-with-filetered-read-matches)
+    + [pre-parse cmscan tabular output](#pre-parse-cmscan-tabular-output)
+    + [filtration of the cmscan matches](#filtration-of-the-cmscan-matches)
 
 <small><i><a href='http://ecotrust-canada.github.io/markdown-toc/'>Table of contents generated with markdown-toc</a></i></small>
 
 
 
-# tRNA methylation
+
+## introduction
+
+For a successful and timely analysis we used computing cluster managed using SLURM. 
+While vast majority of the steps can be performed on a mainstream workstation creation of the genomic database for LAST and fastq mapping should be done on machines with > 32G RAM.
+
 
 ## genome and annotation
 
