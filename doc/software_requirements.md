@@ -1,4 +1,23 @@
-# software 
+# Software
+
+
+- [aligners/mappers](#aligners-mappers)
+  * [LAST mapper](#last-mapper)
+  * [Infernal](#infernal)
+- [general tools](#general-tools)
+  * [bedtools](#bedtools)
+  * [clumpify from BBMap](#clumpify-from-bbmap)
+  * [fastp](#fastp)
+  * [```usearch```](#---usearch---)
+  * [```fqgrep```](#---fqgrep---)
+- [system utils](#system-utils)
+  * [```ripgrep```](#---ripgrep---)
+  * [```choose```](#---choose---)
+  * [pigz](#pigz)
+  * [fish shell](#fish-shell)
+
+<small><i><a href='http://ecotrust-canada.github.io/markdown-toc/'>Table of contents generated with markdown-toc</a></i></small>
+
 
 
 ## aligners/mappers
