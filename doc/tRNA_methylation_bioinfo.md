@@ -163,8 +163,7 @@ Names have following names schemes:
 
 Use usearch for clustering identical sequences.
 
-Version used: usearch11.0.667_i86linux32
-Obtained from: https://drive5.com/downloads/usearch11.0.667_i86linux32.gz
+
 
 ```
 usearch -cluster_fast gencode_ensembl.combined_tRNA.all.fa  -id 1.00 -centroids gencode_ensembl.combined_tRNA.uniq.fa
@@ -225,10 +224,6 @@ pigz -8 GRCh38_plus_tRNAs.fa
 ## mapping
 
 Used LAST mapper 
-
-* www:  https://gitlab.com/mcfrith/last
-* version: 1281 
-* installation: compiled from source
 
 ```
 module load gcc/11.2.0
@@ -303,11 +298,6 @@ f8d3140c32e32b7df4888f9697de9923  NoD_BH4_1.fastq.gz
 
 To shrink size and speed up subsequent processing of the fastq data used clumpify.sh from BBMap 
 
-* program: 
-* source: https://sourceforge.net/projects/bbmap/
-* version: 38.96
-* installed: download from the abowe www and unpack
-
 example SLURM shell script:
 
 ```
@@ -350,16 +340,7 @@ Python script for SLURM scripts creation:
 
 ### quality check and optical replicates filtering
 
-* program ```fastp``` 
-* version: 0.23.2
-* installed using: conda
-* install procedure:
-
-```
-conda create --name fastp
-conda activate fastp
-conda install -c bioconda fastp
-```
+Used fastp.
 
 * example SLURM submission script:
 
