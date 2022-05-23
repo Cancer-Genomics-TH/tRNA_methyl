@@ -47,20 +47,19 @@ def seaborn_heatmap(numpy_file_matrix, isotypes_list, in_fn):
     )
     ax.set_xticks(range(0, 105), labels=range(1, 105 + 1))
 
-    ax.set_xlabel('tRNA positions')
-    ax.set_ylabel('isoforms')
+    ax.set_xlabel("tRNA positions")
+    ax.set_ylabel("isoforms")
 
     # heatmap.subplots_adjust(top=.8)
     # FIXME: check https://www.statology.org/seaborn-title/
     ax.set_title(f"{title}")
-    #plt.text(x=4.7, y=4.7, s='Coverage Heat Plot', fontsize=16, weight='bold')
-    #plt.text(x=4.7, y=4.6, s=f'{in_fn}', fontsize=8, alpha=0.75)
+    # plt.text(x=4.7, y=4.7, s='Coverage Heat Plot', fontsize=16, weight='bold')
+    # plt.text(x=4.7, y=4.6, s=f'{in_fn}', fontsize=8, alpha=0.75)
 
-    
     # plt.set_yticklabels(isotypes_list)
     plt.show()
     # FIXME: check the resolution
-    # PNGs or as below SVGs with plots are not OK 
+    # PNGs or as below SVGs with plots are not OK
     # plt.savefig(f"heatmap_coverage_{title_data}.svg", format = "svg")
     # plt.close(fig)
 
@@ -125,7 +124,6 @@ def parse_single_file(in_fn, symbol):
                     isoforms_dict[isotype_cmscan] = Isotype_data({}, {})
                     for i in range(1, MAX_MATCH_POSITION + 1):
                         isoforms_dict[isotype_cmscan].coverage[i] = 0
-                       
 
                 for position in range(match_start, match_end + 1):
                     isoforms_dict[isotype_cmscan].coverage[position] += fragment_count
@@ -147,7 +145,7 @@ def parse_single_file(in_fn, symbol):
             if sorted_tuple[0] in isotypes_one_file_list:
                 size_sorted_isoforms_one_file_list.append(sorted_tuple[0])
 
-        isotypes_one_file_list = size_sorted_isoforms_one_file_list 
+        isotypes_one_file_list = size_sorted_isoforms_one_file_list
         for index, isotype in enumerate(isotypes_one_file_list):
             log.debug(f"""filename: {in_fn} isotypes:""")
             log.debug(f"""{index}, {isotype}""")
@@ -212,9 +210,9 @@ if __name__ == "__main__":
     # get the tRNA idoforms sizes
     with open(PICKLE_FN, "rb") as f:
         trna_sizes_dict = pickle.load(f)
-    
+
     isoform_sizes_sorted = sorted(trna_sizes_dict.items(), key=lambda x: x[1])
-    #pp.pprint(test_sizes)
+    # pp.pprint(test_sizes)
     log.debug(trna_sizes_dict)
 
     process_files(GLOB_PATTERN)
