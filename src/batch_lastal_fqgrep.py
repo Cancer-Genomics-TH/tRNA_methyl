@@ -33,7 +33,7 @@ shell_file_header = f"""#!/bin/bash
 """
 
 env_setup = """
-module load gcc/11.2.0 
+module load gcc/11.2.0
 
 export PATH=/scratch/dkedra/soft/bin:$PATH
 
@@ -58,7 +58,7 @@ for pattern in patterns:
         print(f"#SBATCH --job-name={job_name}")
         print(env_setup)
 
-        command_1 = f"""lastal -v -P{num_of_threads} -Qkeep -C2 {last_db} {fastq_fn} | last-split | gzip > {out_maf_fn} 
+        command_1 = f"""lastal -v -P{num_of_threads} -Qkeep -C2 {last_db} {fastq_fn} | last-split | gzip > {out_maf_fn}
         """
 
         command_1 = command_1.replace(8 * " ", "")
