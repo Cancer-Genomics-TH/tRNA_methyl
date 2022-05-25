@@ -6,6 +6,12 @@ rename "chrM" to ENSEMBL compatible "MT"
 
 using pypy3 for speed
 
+genome from:
+http://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_40/GRCh38.primary_assembly.genome.fa.gz
+
+bf60ecf22f2c2152c7b2d0def040e9b9  GRCh38.primary_assembly.genome.fa.gz
+
+
 usage:
 
 fix_chr_names.py > GRCh38.primary_assembly.genome.names_fix.fa
