@@ -131,3 +131,28 @@ Multithreaded ```gzip``` replacement.
 ### fish shell
 
 Alternative to ```bash`` shell.
+
+
+### ```pypy3```
+
+Faster Python implementation
+
+* www: https://www.pypy.org/
+* version:  Python 3.9.12 / PyPy 7.3.9 
+* https://downloads.python.org/pypy/pypy3.9-v7.3.9-linux64.tar.bz2
+* installation: executable binary after unpacking
+
+### python libraries
+
+Installed using ```pip```
+
+#### main scripts
+* pyfaidx
+* numpy
+* pandas
+* seaborn
+
+#### extras
+* executor
+
+
