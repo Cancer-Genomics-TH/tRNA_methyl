@@ -1,11 +1,24 @@
 #!/usr/bin/env python3
 
+"""
+script for transforming a GTF with tRNA genes to a GTF with a gene_name in the second column
+this fixes the problem:
+when extracting fasta sequences using bedtools based on annotation
+
+the name was not the gene name but value in the second column of the GTF
+
+usage:
+
+preprocess_gtf_4_fasta.py input.gtf > output.gtf
+
+"""
+
 import sys
 
 input_gtf_fn = sys.argv[1]
 
-with open(input_gtf_fn) as f:
-    for line in f:
+with open(input_gtf_fn, encoding="utf-8") as input_fh:
+    for line in input_fh:
         if line[0] == "#":
             pass
         else:
