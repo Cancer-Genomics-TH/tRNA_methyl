@@ -20,9 +20,9 @@ fix_chr_names.py > GRCh38.primary_assembly.genome.names_fix.fa
 
 from pyfaidx import Fasta
 
-genome_fn = "GRCh38.primary_assembly.genome.fa"
+GENOME_FAS_FN = "GRCh38.primary_assembly.genome.fa"
 
-gencode_genome = Fasta(genome_fn)
+gencode_genome = Fasta(GENOME_FAS_FN)
 for seq_id in gencode_genome.keys():
     if seq_id[:3] == "chr":
         if seq_id == "chrM":
