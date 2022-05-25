@@ -72,7 +72,7 @@ def one_file_shell(input_fastq_fn):
         out={out_fq_fn}
         """
 
-        command_1 = textwrap.dedent(command_1)  # .replace(8 * " ", "")
+        command_1 = textwrap.dedent(command_1)
 
         print(command_1)
 
