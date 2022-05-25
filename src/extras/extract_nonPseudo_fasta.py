@@ -1,14 +1,10 @@
 #!/usr/bin/env pypy3
 
 """
-remove "chr" prefix from chromosome names
-rename "chrM" to ENSEMBL compatible "MT"
+extracts Pseudo_tRNA sequences from a fasta
 
-using pypy3 for speed
-
-usage:
-
-fix_chr_names.py > GRCh38.primary_assembly.genome.names_fix.fa
+purpose: 
+input for a check if sequence clustering of all tRNAs puts some of real tRNA sequences into contigs labeled as Pseudo_tRNA 
 
 """
 import sys
