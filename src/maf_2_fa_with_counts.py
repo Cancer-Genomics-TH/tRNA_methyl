@@ -1,13 +1,17 @@
-#!/home/darked89/soft/progs/pypy3.8_7.3.7/bin/pypy3
+#!/usr/bin/env pypy3
 
 """
-uses pypy3 for speed
-
-script to transform 2 lines of maf aligment to a fasta file
+script to transform 2 lines of pre-parsed maf aligment to a fasta file
 with a fasta names containing:
 
 tRNA contig name and the number of counts
 the sequence is from the NGS read match (gaps introduced during the mapping are removed )
+
+uses pypy3 for speed
+
+usage:
+
+maf_2_fa_with_counts.py input.parsed.maf > output.fasta
 
 """
 
@@ -15,20 +19,22 @@ the sequence is from the NGS read match (gaps introduced during the mapping are 
 import string
 import sys
 
-in_fn = sys.argv[1]
+FLOWCELL_PREFIX = "SND"
+
+
+input_maf_fn = sys.argv[1]
 
 sequence_frequency_dict = {}
 
-with open(in_fn) as f:
-    old_trna_id = ""
-    for line in f:
+with open(input_maf_fn, encoding="utf-8") as maf_fh:
+    # old_trna_id = ""
+    for line in maf_fh:
         if line[0] in string.ascii_letters:
             line = line.strip()
             sl = line.split()
             seq_name = sl[0]
-            # print(seq_name)
-            # SND is a prefix for the fastq flow cell/read ids
-            if seq_name[:3] != "SND":
+
+            if not seq_name.startswith(FLOWCELL_PREFIX):
                 trna_id = seq_name
                 match_start = int(sl[1]) + 1
                 match_end = match_start + int(sl[2])
@@ -40,7 +46,7 @@ with open(in_fn) as f:
                     sequence_frequency_dict[match_name] = [1, sequence]
                 else:
                     sequence_frequency_dict[match_name][0] += 1
-                # print(f"{match_name}\t{sequence}")
+
 
 # print(sequence_frequency_dict)
 
