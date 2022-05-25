@@ -1,88 +1,109 @@
 #!/usr/bin/env python3
 
 """
-filtering and quality checking fastq files using fastp 
+creating shell scripts for sbatch/SLURM
+using fqgrep to detect seq kit primers in the fastq files
 
+input: fastq as fq.gz
+output: fqgrep report
 """
 
 import glob
 import os
 import sys
-
-out_dir = "./FQGREP_20220426"
-input_dir = "./FASTP_20220426"
-
-input_fn_pattern_1 = "*.fq.gz"
-patterns = [
-    input_fn_pattern_1,
-]
-
-primers_seq_list = [
-    "TGGAATTCTCGGGTGCCAAGGC",
-    "TGGAATTCTCGGGTGCCAAGG",
-    "TGGAATTCTCGGGTGCCAAG",
-    "TGGAATTCTCGGGTGCCAA",
-    "TGGAATTCTCGGGTGCCA",
-    "GTTCAGAGTTCTACAGTCCGACGATC",
-    "GTTCAGAGTTCTACAGTCCGACGAT",
-    "GTTCAGAGTTCTACAGTCCGACGA",
-    "GTTCAGAGTTCTACAGTCCGACG",
-    "GTTCAGAGTTCTACAGTCCGAC",
-    "GCCTTGGCACCCGAGAATTCCA",
-    "GATCGTCGGACTGTAGAACTCTGAAC",
-]
+import textwrap
 
 
-regex_for_fqgrep = "|".join(primers_seq_list)
+def join_primers():
+    """creates a regex string for fqgrep"""
+    primers_seq_list = [
+        "TGGAATTCTCGGGTGCCAAGGC",
+        "TGGAATTCTCGGGTGCCAAGG",
+        "TGGAATTCTCGGGTGCCAAG",
+        "TGGAATTCTCGGGTGCCAA",
+        "TGGAATTCTCGGGTGCCA",
+        "GTTCAGAGTTCTACAGTCCGACGATC",
+        "GTTCAGAGTTCTACAGTCCGACGAT",
+        "GTTCAGAGTTCTACAGTCCGACGA",
+        "GTTCAGAGTTCTACAGTCCGACG",
+        "GTTCAGAGTTCTACAGTCCGAC",
+        "GCCTTGGCACCCGAGAATTCCA",
+        "GATCGTCGGACTGTAGAACTCTGAAC",
+    ]
 
-# debug
-# print(regex_for_fqgrep)
-
-num_of_threads = 1
-
-shell_file_header = f"""#!/bin/bash
-
-#SBATCH --nodes=1
-#SBATCH --time=00:59:00
-#SBATCH --cpus-per-task={num_of_threads}
-#SBATCH --partition=express
-"""
-
-env_setup = """
-module load gcc/11.2.0 
-
-export LD_LIBRARY_PATH=/scratch/dkedra/soft/lib:$LD_LIBRARY_PATH
-export PATH=/scratch/dkedra/soft/bin:$PATH
-
-"""
+    my_regex = "|".join(primers_seq_list)
+    return my_regex
 
 
-for pattern in patterns:
-    for fastq_fn in glob.glob(f"{input_dir}/{pattern}"):
-        # save the basename  and ending
-        fastq_fn_base = fastq_fn.split("/")[-1]
-        fastq_fn_base = fastq_fn_base.replace(".fq.gz", "")
-        out_report_fn = f"{out_dir}/{fastq_fn_base}.fqgrep_report_pat2.out"
+def slurm_setup(job_name):
+    """prints the SLURM shell file header"""
 
-        job_name = f"fqgrep2_{fastq_fn_base}"
-        shell_fn = f"{job_name}.sh"
+    shell_file_header = f"""
+    #!/bin/bash"
 
-        saveout = sys.stdout
-        output_fh = open(shell_fn, "w")
+    #SBATCH --nodes=1 
+    #SBATCH --time={JOB_TIME} 
+    #SBATCH --cpus-per-task={NUM_OF_THREADS}
+    #SBATCH --partition={SLURM_PARTITION}
+
+    """
+    shell_file_header = textwrap.dedent(shell_file_header)
+
+    env_setup = """
+    module load gcc/11.2.0
+    
+    export LD_LIBRARY_PATH=/scratch/dkedra/soft/lib:$LD_LIBRARY_PATH
+    export PATH=/scratch/dkedra/soft/bin:$PATH
+    """
+
+    env_setup = textwrap.dedent(env_setup)
+
+    print(shell_file_header)
+    print(f"#SBATCH --job-name={job_name}")
+    print(env_setup)
+
+
+def one_file_shell(input_fastq_fn):
+    """create shell for sbatch to run fqgrep on a single fastq input"""
+    # save the basename  and ending
+    fastq_fn_base = input_fastq_fn.split("/")[-1]
+    fastq_fn_base = fastq_fn_base.replace(".fq.gz", "")
+    out_report_fn = f"{OUT_DIR}/{fastq_fn_base}.fqgrep_report_pat2.out"
+
+    job_name = f"fqgrep2_{fastq_fn_base}"
+    shell_fn = f"{job_name}.sh"
+
+    saveout = sys.stdout
+
+    with open(shell_fn, "w", encoding="utf-8") as output_fh:
         sys.stdout = output_fh
+        slurm_setup(job_name)
 
-        print(shell_file_header)
-        print(f"#SBATCH --job-name=job_name")
-        print(env_setup)
-
-        command_1 = f"""fqgrep -r -a -e -p '{regex_for_fqgrep}' -o {out_report_fn}  {fastq_fn} 
+        print("""\necho "starting fqgrep" """)
+        command_1 = f"""
+        fqgrep -r -a -e -p '{regex_for_fqgrep}' -o {out_report_fn}  {input_fastq_fn} 
         """
-
-        command_1 = command_1.replace(8 * " ", "")
+        command_1 = textwrap.dedent(command_1)
 
         print(command_1)
+        print("""\necho "finished fqgrep" """)
         print("\n\n")
 
         sys.stdout = saveout
         output_fh.close()
-        os.system("chmod +x %s" % (shell_fn))
+        os.system(f"chmod +x {shell_fn}")
+
+
+if __name__ == "__main__":
+    INPUT_DIR = "./FASTP_20220426"
+    OUT_DIR = "./FQGREP_20220426"
+
+    SLURM_PARTITION = "express"
+    NUM_OF_THREADS = 1
+    JOB_TIME = "00:50:00"
+
+    regex_for_fqgrep = join_primers()
+
+    INPUT_FASTQ_PATTERN = "*.fq.gz"
+    for fastq_fn in glob.glob(f"{INPUT_DIR}/{INPUT_FASTQ_PATTERN}"):
+        one_file_shell(fastq_fn)
