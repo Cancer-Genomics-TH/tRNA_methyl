@@ -7,4 +7,3 @@ Contains the description of the data processing steps, file locations and the sc
 For the details see: 
 
 https://github.com/darked89/tRNA_methyl/blob/main/doc/tRNA_methylation_bioinfo.md
-
