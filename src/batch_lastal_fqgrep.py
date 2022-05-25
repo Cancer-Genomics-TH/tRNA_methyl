@@ -83,7 +83,7 @@ if __name__ == "__main__":
     OUT_DIR = "./map_results/fqgrep_masked"
 
     LASTDB_FN = "genome_last/hg38_tRNAs/GRCh38_plus_tRNAs.last"
-    # fastq masked input fastq
+    # fastq masked input fastq files
     INPUT_PATTERN = "*.clump_opt_dedup.fastp.fqgrep_mask.fq.gz"
 
     for fastq_fn in glob.glob(f"{INPUT_DIR}/{INPUT_PATTERN}"):
