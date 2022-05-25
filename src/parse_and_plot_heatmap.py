@@ -34,16 +34,21 @@ def seaborn_heatmap(numpy_file_matrix, isotypes_list, in_fn):
     title = f"Normalized Coverage Heat Plot of {title_data}"
     ## (normalized by tRNA isotype mappings)"
 
+    short_names_isotypes_list = [x[5:] for x in isotypes_list]
+
     df = pd.DataFrame(numpy_file_matrix)
     df.index = isotypes_list
-    log.info(f"""df_hape:, {df.shape}""")
+    log.debug(f"df_shape: {df.shape}")
 
     fig, ax = plt.subplots()
 
     sns.heatmap(df, cmap="Reds", linewidth=1, linecolor="w", square=True)
 
     ax.set_yticks(
-        range(0, len(isotypes_list)), labels=isotypes_list, fontname="monospace"
+        # range(0, len(isotypes_list)), labels=isotypes_list, fontname="monospace"
+        range(0, len(isotypes_list)),
+        labels=short_names_isotypes_list,
+        fontname="monospace",
     )
     ax.set_xticks(range(0, 105), labels=range(1, 105 + 1))
 
@@ -59,13 +64,13 @@ def seaborn_heatmap(numpy_file_matrix, isotypes_list, in_fn):
     # plt.set_yticklabels(isotypes_list)
     plt.show()
     # FIXME: check the resolution
-    # PNGs or as below SVGs with plots are not OK
-    # plt.savefig(f"heatmap_coverage_{title_data}.svg", format = "svg")
+    #
+    # plt.savefig(f"heatmap_coverage_{title_data}.pdf", format = "pdf")
     # plt.close(fig)
 
 
 def normalize_isotype_data(isotype_data_input, isotype):
-    """FIXME"""
+    """scale counts using the total coverage of the given isoform in the result"""
 
     last_coverage_pos = MAX_MATCH_POSITION
 
@@ -107,30 +112,35 @@ def normalize_isotype_data(isotype_data_input, isotype):
     return coverage_list
 
 
-def parse_single_file(in_fn, symbol):
-    """FIXME"""
+def parse_single_file(input_fn, symbol):
+    """single file iso"""
     isoforms_dict = {}
-    with open(in_fn) as fh:
-        for line in fh:
+    with open(input_fn, encoding="utf-8") as input_fh:
+        for line in input_fh:
             line = line.strip()
             sl = line.split()
             isotype_cmscan = sl[0]
-            fragment_count = int(sl[2].split("count")[-1])
-            match_start = int(sl[5])
-            match_end = int(sl[6])
-            score = float(sl[-3])
-            if (fragment_count >= MIN_COUNT) and (score <= MIN_SCORE):
-                if isotype_cmscan not in isoforms_dict.keys():
-                    isoforms_dict[isotype_cmscan] = Isotype_data({}, {})
-                    for i in range(1, MAX_MATCH_POSITION + 1):
-                        isoforms_dict[isotype_cmscan].coverage[i] = 0
+            if isotype_cmscan in trna_order_list:
+                # print(isotype_cmscan)
+                fragment_count = int(sl[2].split("count")[-1])
+                match_start = int(sl[5])
+                match_end = int(sl[6])
+                score = float(sl[-3])
+                if (fragment_count >= MIN_COUNT) and (score <= MIN_SCORE):
+                    if isotype_cmscan not in isoforms_dict.keys():
+                        isoforms_dict[isotype_cmscan] = Isotype_data({}, {})
+                        for i in range(1, MAX_MATCH_POSITION + 1):
+                            isoforms_dict[isotype_cmscan].coverage[i] = 0
 
-                for position in range(match_start, match_end + 1):
-                    isoforms_dict[isotype_cmscan].coverage[position] += fragment_count
-
+                    for position in range(match_start, match_end + 1):
+                        isoforms_dict[isotype_cmscan].coverage[
+                            position
+                        ] += fragment_count
+            else:
+                pass
         isotypes_one_file_list = list(isoforms_dict.keys())
         num_of_one_file_isotypes = len(isotypes_one_file_list)
-
+        print(f"num_of_one_file_isotypes: {num_of_one_file_isotypes}")
         numpy_file_matrix = np.arange(
             num_of_one_file_isotypes * MAX_MATCH_POSITION, dtype=float
         )
@@ -140,27 +150,26 @@ def parse_single_file(in_fn, symbol):
         numpy_file_matrix = np.zeros_like(numpy_file_matrix)
         log.info(f"""numpy_file_matrix_shape: {numpy_file_matrix.shape}""")
         log.debug(numpy_file_matrix)
-        size_sorted_isoforms_one_file_list = []
-        for sorted_tuple in isoform_sizes_sorted:
-            if sorted_tuple[0] in isotypes_one_file_list:
-                size_sorted_isoforms_one_file_list.append(sorted_tuple[0])
+        ordered_isotypes_one_file_list = []
+        for isotype_name in trna_order_list:
+            if isotype_name in isotypes_one_file_list:
+                ordered_isotypes_one_file_list.append(isotype_name)
 
-        isotypes_one_file_list = size_sorted_isoforms_one_file_list
-        for index, isotype in enumerate(isotypes_one_file_list):
-            log.debug(f"""filename: {in_fn} isotypes:""")
+        for index, isotype in enumerate(ordered_isotypes_one_file_list):
+            log.debug(f"""filename: {input_fn} isotypes:""")
             log.debug(f"""{index}, {isotype}""")
             numpy_file_matrix[index, :] = normalize_isotype_data(
                 isoforms_dict[isotype], isotype
             )
-        ##print("normalized p1 ends")
-        # pp.pprint(numpy_file_matrix)
-        # get_heatmap(numpy_file_matrix, isotypes_one_file_list, in_fn)
-        seaborn_heatmap(numpy_file_matrix, isotypes_one_file_list, in_fn)
+
+        seaborn_heatmap(numpy_file_matrix, ordered_isotypes_one_file_list, input_fn)
     return isoforms_dict
 
 
 def process_files(glob_pattern):
-    """FIXME"""
+    """iterates over the result files feeding them to parsing function"""
+    # FIXME(?): more complicated than used downstream
+
     for in_fn in glob.glob(glob_pattern):
         sample_name = in_fn.split(".")[0]
         split_sample_name = sample_name.split("_")
@@ -179,6 +188,9 @@ def process_files(glob_pattern):
         file_isoforms_dict = parse_single_file(in_fn, symbol)
         samples_dict[sample_grp][symbol] = file_isoforms_dict
 
+
+##def get_trna_order():
+##    with open()
 
 if __name__ == "__main__":
     # logging setup
@@ -201,18 +213,25 @@ if __name__ == "__main__":
         )
 
     # settings
-    PICKLE_FN = "trna_sizes.pickle"
+
     MIN_COUNT = 10
     MIN_SCORE = 1e-03
     MAX_MATCH_POSITION = 105
     GLOB_PATTERN = "*.cmscan_isoall.top_hits.out"
 
-    # get the tRNA idoforms sizes
+    # get the tRNA isoforms sizes
+    PICKLE_FN = "trna_sizes.pickle"
     with open(PICKLE_FN, "rb") as f:
         trna_sizes_dict = pickle.load(f)
-
     isoform_sizes_sorted = sorted(trna_sizes_dict.items(), key=lambda x: x[1])
-    # pp.pprint(test_sizes)
+
     log.debug(trna_sizes_dict)
 
+    TRNA_ORDER_FN = "trna_ordering_plots.txt"
+    trna_order_list = []
+    with open(TRNA_ORDER_FN, encoding="utf-8") as fh:
+        for line in fh:
+            trna_name = line.strip()
+            trna_order_list.append(trna_name)
+    # log.debug(trna_order_list)
     process_files(GLOB_PATTERN)
