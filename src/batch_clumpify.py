@@ -37,9 +37,10 @@ def slurm_setup(job_name):
     print(env_setup)
 
 
-def one_file_shell(fastq_fn):
+def one_file_shell(input_fastq_fn):
+    """create shell file for sbatch/SLURM to run fastp"""
     # save the basename  and ending
-    fastq_fn_base = fastq_fn.split("/")[-1]
+    fastq_fn_base = input_fastq_fn.split("/")[-1]
     fastq_fn_base = fastq_fn_base.replace(".fastq.gz", "")
 
     out_fq_fn = f"{TOP_OUT_DIR}/{fastq_fn_base}.clump_opt_dedup.fq.gz"
@@ -54,10 +55,10 @@ def one_file_shell(fastq_fn):
         slurm_setup(job_name)
 
         print("""echo "starting clumpify" """)
-        print(date)
+        print("date")
 
         command_1 = f"""
-        {clumpify_exe} \\
+        {CLUMPIFY_EXE} \\
         dedupe=t \\
         optical=t \\
         reorder=a \\
@@ -67,7 +68,7 @@ def one_file_shell(fastq_fn):
         pigz={NUM_PIGZ_THREADS} \\
         unpigz={NUM_PIGZ_THREADS} \\
         lowcomplexity=t \\
-        in={fastq_fn} \\
+        in={input_fastq_fn} \\
         out={out_fq_fn}
         """
 
@@ -77,14 +78,21 @@ def one_file_shell(fastq_fn):
 
         print("\n\n")
         print("""echo "finished clumpify" """)
-        print(date)
+        print("date")
 
         sys.stdout = saveout
         output_fh.close()
-        os.system("chmod +x %s" % (shell_fn))
+        os.system("chmod +x {shell_fn}")
 
 
 if __name__ == "__main__":
+
+    # setup
+    JOB_TIME = "05:00:00"
+    SLURM_PARTITION = "mem"
+    NUM_OF_THREADS = 16
+    NUM_PIGZ_THREADS = 6
+
     ## setup clump
     INPUT_DIR = "./ORIG/"
     INPUT_PATTERN = "*.fastq.gz"
@@ -93,12 +101,7 @@ if __name__ == "__main__":
     CLUMP_OUT_DIR = "CLUMP_20220524"
     output_dir_top = f"{TOP_OUT_DIR}/CLUMP_OUT_DIR"
 
-    clumpify_exe = "/scratch/dkedra/soft/progs/bbmap_current/clumpify.sh"
-    NUM_OF_THREADS = 16
-    NUM_PIGZ_THREADS = 6
+    CLUMPIFY_EXE = "/scratch/dkedra/soft/progs/bbmap_current/clumpify.sh"
 
-    # setup
-    JOB_TIME = "05:00:00"
-    SLURM_PARTITION = "mem"
     for fastq_fn in glob.glob(f"{INPUT_DIR}/{INPUT_PATTERN}"):
         one_file_shell(fastq_fn)
