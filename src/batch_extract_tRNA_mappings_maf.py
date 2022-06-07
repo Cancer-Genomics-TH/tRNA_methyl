@@ -20,13 +20,15 @@ import textwrap
 def slurm_setup(job_name):
     """prints the SLURM shell file header"""
 
+    print("/usr/bin/bash") 
+
     shell_file_header = f"""
-    #!/usr/bin/bash
 
     #SBATCH --nodes=1
     #SBATCH --time={JOB_TIME}
     #SBATCH --cpus-per-task={NUM_OF_THREADS}
     #SBATCH --partition={SLURM_PARTITION}
+    
     """
     shell_file_header = textwrap.dedent(shell_file_header)
 

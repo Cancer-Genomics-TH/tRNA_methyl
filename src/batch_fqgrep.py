@@ -38,8 +38,9 @@ def join_primers():
 def slurm_setup(job_name):
     """prints the SLURM shell file header"""
 
+    print("/usr/bin/bash") 
+
     shell_file_header = f"""
-    #!/bin/bash"
 
     #SBATCH --nodes=1 
     #SBATCH --time={JOB_TIME} 
