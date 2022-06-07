@@ -8,7 +8,7 @@
     - [ENSEMBL](#ensembl)
     - [masking tRNAs in the genome](#masking-trnas-in-the-genome)
     - [extracting the tRNA sequences](#extracting-the-trna-sequences)
-    - [getting uniqe sequences only](#getting-uniqe-sequences-only)
+    - [getting unique sequences only](#getting-unique-sequences-only)
     - [creating an artificial genome](#creating-an-artificial-genome)
   - [mapping](#mapping)
     - [create genomic index](#create-genomic-index)
@@ -168,7 +168,7 @@ Names have following names schemes:
 
 ```
 
-### getting uniqe sequences only
+### getting unique sequences only
 
 
 Use usearch for clustering identical sequences.
