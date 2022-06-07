@@ -23,7 +23,7 @@ graph TD
     unique_trnas_seq_names-->|ripgrep, yyy_script|trna_matches_with_counts[fasta with fastq-derived tRNA seq matches with counts] 
     maf_result-->|ripgrep, yyy_script|trna_matches_with_counts
     gtRNAdb{gtRNAdb aligment}-->|download|html_aligment[html page with human tRNA aligments]
-    html_aligment-->|ripgrep, zzz_script|stockholm_align[text file with human tRNAs alihments in Stockholm format]
+    html_aligment-->|ripgrep, tab_gtrna_to_stockholm.py|stockholm_align[text file with human tRNAs alihments in Stockholm format]
     stockholm_align-->|Infernal tools|cmscan_files[files for cmscan searches]
     cmscan_files-->|cmscan|cmscan_mapping_result[tabular mapping results]
     trna_matches_with_counts-->|cmscan|cmscan_mapping_result
