@@ -20,7 +20,7 @@ graph TD
     clumped_fastped_masked_fastq-->|lastal|maf_result[mapping result MAF file]
     last_database-->|lastall|maf_result
     unique_trnas_seq-->|ripgrep,sed|unique_trnas_seq_names[text file with unique by sequence tRNAs names]
-    unique_trnas_seq_names-->|ripgrep, yyy_script|trna_matches_with_counts[fasta with fastq-derived tRNA seq matches with counts] 
+    unique_trnas_seq_names-->|ripgrep, maf_2_fa_with_counts.py|trna_matches_with_counts[fasta with fastq-derived tRNA seq matches with counts] 
     maf_result-->|ripgrep, yyy_script|trna_matches_with_counts
     gtRNAdb{gtRNAdb aligment}-->|download|html_aligment[html page with human tRNA aligments]
     html_aligment-->|ripgrep, tab_gtrna_to_stockholm.py|stockholm_align[text file with human tRNAs alihments in Stockholm format]
