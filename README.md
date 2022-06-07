@@ -14,7 +14,7 @@ Contains the description of the data processing steps, file locations and the sc
 
 **CAVEAT**
 
-Work in progress. Please report any problems using Issues on this repository.
+Work in progress. Please report any problems using [Issues](https://github.com/Cancer-Genomics-TH/tRNA_methyl/issues) for this repository.
 
 ## External
 
