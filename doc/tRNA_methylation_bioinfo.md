@@ -51,9 +51,11 @@ Release used: 40
 
 * Obtained genome fasta and tRNA annotation GTF files:
 
-```sh
+```console
+
 wget http://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_40/GRCh38.primary_assembly.genome.fa.gz
 wget http://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_40/gencode.v40.tRNAs.gtf.gz
+
 ```
 
 * gunzip
