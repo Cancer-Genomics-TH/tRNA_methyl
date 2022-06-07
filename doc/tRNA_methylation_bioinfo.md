@@ -51,21 +51,21 @@ Release used: 40
 
 * Obtained genome fasta and tRNA annotation GTF files:
 
-```(sh)
+```sh
 wget http://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_40/GRCh38.primary_assembly.genome.fa.gz
 wget http://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_40/gencode.v40.tRNAs.gtf.gz
 ```
 
 * gunzip
 
-```(sh)
+```sh
 gunzip GRCh38.primary_assembly.genome.fa.gz
 gunzip gencode.v40.tRNAs.gtf.gz
 ```
 
 * fixed chromosome names and removed annotation for MT in GTF
 
-```(sh)
+```sh
 # ripgrep (rg) can be replaced with grep
 
 rg -v '^chrM' gencode.v40.tRNAs.gtf | sed 's/^chr//g' > gencode.v40.tRNAs.no_chrM.gtf
@@ -76,7 +76,7 @@ rg -v '^chrM' gencode.v40.tRNAs.gtf | sed 's/^chr//g' > gencode.v40.tRNAs.no_chr
 separate Python/pypy3 script
 pyfaidx need to be installed, see: https://pypi.org/project/pyfaidx/
 
-```(sh)
+```sh
 ./fix_chr_names.py > GRCh38.primary_assembly.genome.names_fix.fa
 
 ```
@@ -87,20 +87,20 @@ Release used: 106
 
 * obtain GTF annotation
 
-```(sh)
+```sh
 wget http://ftp.ensembl.org/pub/release-106/gtf/homo_sapiens/Homo_sapiens.GRCh38.106.gtf.gz
 ```
 
 * extract mitochondrial tRNA annotations
 
-```(sh)
+```sh
 rg -z '^MT' Homo_sapiens.GRCh38.106.gtf.gz | rg '\tgene\t' | rg -w Mt_tRNA > ensembl_106.MT_tRNA.gtf
 
 ```
 
 ### masking tRNAs in the genome
 
-```(sh)
+```sh
 # create combined GTF for masking
 
 cat gencode.v40.tRNAs.no_chrM.gtf ensembl_106.MT_tRNA.gtf > gencode_ensembl.combined_tRNA.gtf 
@@ -119,7 +119,7 @@ bedtools maskfasta -fi GRCh38.primary_assembly.genome.names_fix.fa \
 
 separate script Python
 
-```(sh)
+```sh
 ./preprocess_gtf_4_fasta.py gencode_ensembl.combined_tRNA.gtf > gencode_ensembl.combined_tRNA.4_extraction.gtf
 ```
 
@@ -127,7 +127,7 @@ separate script Python
 
 The '''-s''' switch ensures that the extracted sequence is in the correct orientation
 
-```(sh)
+```sh
  bedtools getfasta -s -name \
  -fi GRCh38.primary_assembly.genome.names_fix.fa \
  -bed gencode_ensembl.combined_tRNA.4_extraction.gtf  > gencode_ensembl.combined_tRNA.all.fa
@@ -144,7 +144,7 @@ Names have following names schemes:
 
 * Gencode
 
-```(txt)
+```txt
 >Pseudo_tRNA::1:7930278-7930348(-)
 >Asn_tRNA::1:16520584-16520658(-)
 >Asn_tRNA::1:16532397-16532471(-)
@@ -154,7 +154,7 @@ Names have following names schemes:
 
 * ENSEMBL MT tRNAs
   
-```(txt)
+```txt
 >MT-TD::MT:7517-7585(+)
 >MT-TK::MT:8294-8364(+)
 >MT-TG::MT:9990-10058(+)
@@ -175,7 +175,7 @@ Use usearch for clustering identical sequences.
 
 
 
-```(sh)
+```sh
 usearch -cluster_fast gencode_ensembl.combined_tRNA.all.fa  -id 1.00 -centroids gencode_ensembl.combined_tRNA.uniq.fa
 ```
 
@@ -184,7 +184,7 @@ After clustering all 22 MT tRNA names are present. Pseudo_tRNAs drop from 114 to
 **Caveat**
 Since there was a possibility that some expressed, true tRNAs will cluster to some Pseudo_tRNA I did a check:
 
-```(sh)
+```sh
 #extract the Pseudo_tRNAs
 rg -A1 '^>Pseudo' gencode_ensembl.combined_tRNA.all.fa | rg -v '^\-' > gencode_ensembl.combined_tRNA.pseudo.fa
 
@@ -198,7 +198,7 @@ rg -c '^>'  gencode_ensembl.combined_tRNA.pseudo.uniq.fa
 
 After Psuedo_tRNA sequence clustering the number of sequences is also 109  
 
-```(sh)
+```sh
 # extract non Pseudo tRNAs
 ./extract_nonPseudo_fasta.py gencode_ensembl.combined_tRNA.all.fa > gencode_ensembl.combined_tRNA.non_pseudo.fa
 
@@ -218,7 +218,7 @@ rg -c '^>' gencode_ensembl.combined_tRNA.non_pseudo.uniq.fa
 
 This is to combina the genomic sequence with masked (using tRNA GTF annotations) with extracted unique tRNA (and Pseudo_tRNA sequences just in case if these are also expresed).
 
-```(sh)
+```sh
 # concatenate two fasta files
 cat GRCh38.primary_assembly.genome.names_fix.masked_tRNAs.fa gencode_ensembl.combined_tRNA.uniq.fa >  GRCh38_plus_tRNAs.fa
 
@@ -235,7 +235,7 @@ pigz -8 GRCh38_plus_tRNAs.fa
 
 Used LAST mapper. Installed from source:
 
-```(sh)
+```sh
 module load gcc/11.2.0
 make 
 ```
@@ -245,7 +245,7 @@ make
 
 * unpack
 
-```(sh)
+```sh
 # gunzip fasta
 pigz -d GRCh38_plus_tRNAs.fa.gz
 
@@ -253,7 +253,7 @@ pigz -d GRCh38_plus_tRNAs.fa.gz
 
 * slurm script
 
-```(sh)
+```sh
 #!/bin/bash
 
 #SBATCH --nodes=1
@@ -273,7 +273,7 @@ lastdb -P24 -uNEAR GRCh38_plus_tRNAs.last GRCh38_plus_tRNAs.fa
 
 * sizes/names
 
-```(sh)
+```sh
 # command
 ls -l *fastq.gz 
 
@@ -287,7 +287,7 @@ ls -l *fastq.gz
 
 * md5 checksums
 
-```(sh)
+```sh
 # command
 md5sum *fastq.gz 
 
@@ -300,7 +300,7 @@ f8d3140c32e32b7df4888f9697de9923  NoD_BH4_1.fastq.gz
 
 * location on HPC cluster
 
-```(sh)
+```sh
 /scratch/dkedra/proj/trna_20220426/FQ_data/ORIG
 ```
 
@@ -310,7 +310,7 @@ To shrink size and speed up subsequent processing of the fastq data used clumpif
 
 example SLURM shell script:
 
-```(sh)
+```sh
 #!/bin/bash
 
 #SBATCH --nodes=1
@@ -341,7 +341,7 @@ out=.//CLUMP_20220426/D_1.clump_opt_dedup.fq.gz
 
 Python script for SLURM scripts creation:
 
-```(sh)
+```sh
 #dir: /scratch/dkedra/proj/trna_20220426/FQ_data
 
 ./batch_clumpify.py
@@ -354,7 +354,7 @@ Used fastp.
 
 * example SLURM submission script:
 
-```(sh)
+```sh
 #!/bin/bash
 
 #SBATCH --nodes=1
@@ -384,7 +384,7 @@ fastp \
 
 Python script for SLURM scripts creation:
 
-```(sh)
+```sh
 #dir: /scratch/dkedra/proj/trna_20220426/FQ_data
 
 ./batch_fastp.py
@@ -398,7 +398,7 @@ In order to improve mappings/not include primer derived base(s) i.e. at the matc
 
 * example SLURM script to create fqgrep report
 
-```(sh)
+```sh
 #!/bin/bash
 
 #SBATCH --nodes=1
@@ -432,7 +432,7 @@ C|GCCTTGGCACCCGAGAATTCCA|GATCGTCGGACTGTAGAACTCTGAAC' -o ./FQGREP_20220426/D_1.cl
 
 * example SLURM shell code
 
-```(sh)
+```sh
 #!/bin/bash
 
 #SBATCH --nodes=1
@@ -468,7 +468,7 @@ the file: ```meta_data/trna_names_short.with_s.txt```
 * Pseudo_tRNAs 
 * SeC(e)_tRNA, SeC_tRNA, Sup_tRNA, Undet_tRNA
 
-```(txt)
+```txt
 count	seq_name	match_start	match_end	seq_len	match_seq
 14	Ala_tRNA::11:50274707-50274779(-)	1	26	72	GGGGGTGTAGCTCAGTGGTAGAGCGG
 1	Ala_tRNA::11:50274707-50274779(-)	1	40	72	GGGGGTGTAGCTCAGTGGTAGAGCGGATGCTTTGCATGTA
@@ -481,7 +481,7 @@ count	seq_name	match_start	match_end	seq_len	match_seq
 * python batch script ```src/batch_extract_tRNA_mappings_maf.py```
 * example SLURM script
 
-```(sh)
+```sh
 #!/bin/bash
 
 #SBATCH --nodes=1
@@ -511,7 +511,7 @@ rg -z --threads 4 -f /scratch/dkedra/proj/trna_20220426/mapping/trna_names_short
 **Note**
 Using ```pigz``` instead of ripgrep's ```rg -z``` is faster. 
 In fish shell
-```(sh)
+```sh
 for fn in *maf.gz 
     pigz --stdout -d $fn | rg -A1 --no-context-separator  -f ../../trna_names_short.with_s.txt |  choose --character-wise 2.. > (basename $fn .maf.gz).trna_matches.2lines
 end
@@ -530,7 +530,7 @@ Get the aligments for a subset of tRNAs specified in ```meta_data/priority_match
 fish shell command 
 
 
-```(sh)
+```sh
 for fn in *.maf.gz 
     rg -z -A 1 -f priority_matches.txt $fn | gzip > (basename $fn .maf.gz).priority.align.gz
 end
@@ -538,7 +538,7 @@ end
 
 * output format
 
-```(txt)
+```txt
 s Val_tRNA::3:169772229-169772302(+)        0 35 + 73 GTTTCCGTAGTGTAGTGGTTATCACGTTCGCCTAA
 s SND00105:1227:CCV44ANXX:4:2309:7593:87815 4 35 + 51 GTTTCCGTAGTGTAGTGGTTATCAAGTTCGCCTAA
 --
@@ -553,7 +553,7 @@ s SND00105:1227:CCV44ANXX:4:2209:13167:79726 4 35 + 51 GTTTCCGTAGTGTAGTGGTTATCAA
 
 * command (fish)
 
-```(sh)
+```sh
 for fn in *align
     echo $fn
     ./parse_maf_trna_alignments.py $fn > (basename $fn .align).align.10count.fa
@@ -564,7 +564,7 @@ end
 
 * example output
 
-```(txt)
+```txt
 >Ala_tRNA::12:124939965-124940037(+)_46_73_count747
 CCCCGGGTTCAATCCCCGGCATCTCCA
 >Ile_tRNA::6:26554121-26554195(+)_48_75_count1149
@@ -588,7 +588,7 @@ Above html was transformed to text and then to Stockholm aligment format in a fo
 
 * text processing from html to 2 colum aligments
 
-```(sh)
+```sh
 wget --output-document=gtrna_align.raw.html  http://gtrnadb.ucsc.edu/genomes/eukaryota/Hsapi38/Hsapi38-align.html
 
 sed 's/<span ID=b.>//g' gtrna_align.raw.html |sed 's/<span ID=b..>//g' | sed 's/<\/span>//g' | rg -v ">>" | rg -v '^<' | sed 's/<a name//g' | sed 's/><\/a>//g' | tr -d '=' > gtrna_align.ver1.txt
@@ -604,7 +604,7 @@ This gives a 2 column file ```gtrna_align.isotypes.51.2cols``` with 422 lines
 
 * alternative more inclusive set
 
-```(sh)
+```sh
 rg -v '^[\t," "]' gtrna_align.ver1.txt | rg -v 'filtered' | rg 'tRNA-' | choose ..2 >  gtrna_align.isotypes.all.2cols
 
 ```
@@ -614,7 +614,7 @@ output: ```gtrna_align.isotypes.all.2cols``` has 433 lines.
 
 * from 2 column aligment to stockholm
 
-```(sh)
+```sh
 # canonical 51 set:
 ./tab_gtrna_to_stockholm.py gtrna_align.isotypes.51.2cols > gtrna_align.isotypes.51.sto
 
@@ -628,7 +628,7 @@ output: ```gtrna_align.isotypes.all.2cols``` has 433 lines.
 
 #### create a ```.cm``` file using ```cmbuild```
 
-```(sh)
+```sh
 # canonical 51 set:
 cmbuild --noss -F gtrna_align.isotypes.51.cm  gtrna_align.isotypes.51.sto
 
@@ -645,7 +645,7 @@ On mem machines with 48 threads calibrating one aligment requires 20-30s.
 
 * example commands
 
-```(sh)
+```sh
 # canonical 51 set:
 cmcalibrate --cpu 48 --gtrna_align.isotypes.51.cm
 
@@ -655,7 +655,7 @@ cmcalibrate --cpu 48 gtrna_align.isotypes.all.cm
 
 * SLURM script for mem partition
 
-```(sh)
+```sh
 #!/bin/bash
 
 #SBATCH --nodes=1
@@ -677,7 +677,7 @@ cmcalibrate --cpu 48 gtrna_align.isotypes.all.cm
 
 This works in seconds:
 
-```(txt)
+```txt
 # canonical 51 set:
 cmpress gtrna_align.isotypes.51.sto
 
@@ -687,7 +687,7 @@ cmpress gtrna_align.isotypes.all.cm
 
 * output example:
 
-```(txt)
+```txt
 -rw-r--r-- 1 dkedra ubbiomed  625734 May 16 11:54 gtrna_align.isotypes.all.cm.i1p
 -rw-r--r-- 1 dkedra ubbiomed 1753630 May 16 11:54 gtrna_align.isotypes.all.cm.i1m
 -rw-r--r-- 1 dkedra ubbiomed    2082 May 16 11:54 gtrna_align.isotypes.all.cm.i1i
@@ -703,13 +703,13 @@ One can speed up cmscan using ```--cpu {num_of_threads}```
 
 * example command
 
-```(sh)
+```sh
 cmscan -o D_1.clump_opt_dedup.fastp.lastal.hg38-tRNAs.priority.align.cmscan_tmp  --tblout D_1.clump_opt_dedup.fastp.lastal.hg38-tRNAs.priority.align.10count.cmscan_51_out ../gtrna_align.isotypes.51.cm  D_1.clump_opt_dedup.fastp.lastal.hg38-tRNAs.priority.align.10count.fa
 ```
 
 * fish command to search all 4 fasta files
 
-```(sh)
+```sh
 for fn in *fa 
     echo $fn
     cmscan -o (basename $fn .fa).cmscan_tmp --tblout (basename $fn .fa).cmscan_isoall.out ./gtrna_align.isotypes.all.cm $fn 
@@ -725,7 +725,7 @@ Because the cmscan reports by default not just top hits for a given query the ou
 
 * example command
 
-```(sh)
+```sh
 ./parse_top_hits_cmscan.py D_1.clump_opt_dedup.fastp.lastal.hg38-tRNAs.priority.align.10count.cmscan51_out | sort >  D_1.clump_opt_dedup.fastp.lastal.hg38-tRNAs.priority.align.10count.cmscan51_out.top_hits
 ```
 
@@ -736,7 +736,7 @@ There are two requirements to include fragment mappings into the final stats/ he
 1. each fragment was observed at least 10x in the LAST aligner mappings per fastq file
 2. the cmscan E-value <= 1e-04
 
-```(txt)
+```txt
 min_count = 10
 min_score = 1e-04
 ```
