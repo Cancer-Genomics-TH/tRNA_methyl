@@ -31,6 +31,6 @@ graph TD
     cmscan_top_hits-->|normalize coverage and plot|heat_maps[heat maps]
     fastq{fastq input} -->|clumpify| clumped_fastq(fastq minus optical replicates, clustered reads)
     clumped_fastq -->|fastp| clumped_fastped_fastq[fastq minus low complexity reads]
-    clumped_fastped_fastq -->|fqgrep,xxx_python script|clumped_fastped_masked_fastq[fastq with masked primer sequences]
+    clumped_fastped_fastq -->|fqgrep, batch_fqgrep.py script|clumped_fastped_masked_fastq[fastq with masked primer sequences]
     
 ```
