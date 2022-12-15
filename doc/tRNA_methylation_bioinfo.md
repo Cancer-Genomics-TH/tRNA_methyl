@@ -51,7 +51,7 @@ Release used: 40
 
 * Obtained genome fasta and tRNA annotation GTF files:
 
-```console
+```sh
 
 wget http://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_40/GRCh38.primary_assembly.genome.fa.gz
 wget http://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_40/gencode.v40.tRNAs.gtf.gz
@@ -96,6 +96,7 @@ wget http://ftp.ensembl.org/pub/release-106/gtf/homo_sapiens/Homo_sapiens.GRCh38
 * extract mitochondrial tRNA annotations
 
 ```sh
+
 rg -z '^MT' Homo_sapiens.GRCh38.106.gtf.gz | rg '\tgene\t' | rg -w Mt_tRNA > ensembl_106.MT_tRNA.gtf
 
 ```
