@@ -214,7 +214,21 @@ rg -c '^>' gencode_ensembl.combined_tRNA.non_pseudo.uniq.fa
 
 ```
 
-393 unique non-Pseudo tRNAs => no true tRNA clusters with Pseudo_tRNA tand "vanishes".
+393 unique non-Pseudo tRNAs => no true tRNA clusters with Pseudo_tRNA and "vanishes".
+
+
+### fixing tRNA sequence names
+
+The contig identifiers containing i.e. round brackets are not compatible with IGV viewer. Also the mitochondrial tRNAs names have a different naming convention.
+To resolve issues downstream these names were changed:
+
+```
+sed -e '/^>MT/ s/_MT:/_tRNA_MT:/g'  gencode_ensembl.combined_tRNA.uniq.fa | sed  '/^>/ s/::/_/g; s/(+)/F/g ; s/(-)/R/g;  s/SeC(e)/SeCe/g' >  
+gencode_ensembl.combined_tRNA.uniq.name_fix.fa
+
+#rename file for the compability with the downstream docs 
+mv gencode_ensembl.combined_tRNA.uniq.name_fix.fa gencode_ensembl.combined_tRNA.uniq.fa
+```
 
 
 ### creating an artificial genome
@@ -223,11 +237,15 @@ This is to combina the genomic sequence with masked (using tRNA GTF annotations)
 
 ```sh
 # concatenate two fasta files
-cat GRCh38.primary_assembly.genome.names_fix.masked_tRNAs.fa gencode_ensembl.combined_tRNA.uniq.fa >  GRCh38_plus_tRNAs.fa
+cat GRCh38.primary_assembly.genome.names_fix.masked_tRNAs.fa  gencode_ensembl.combined_tRNA.uniq.fa >  GRCh38_plus_tRNAs.fa
 
-# fingerprint
-md5sum GRCh38_plus_tRNAs.fa 
-1fdead45afd0e95d59bb0bf8e5e92f84  GRCh38_plus_tRNAs.fa
+
+# fix different sequence lenghts for downstream samtools faidx
+# used fastareformat from exonerate
+### fastareformat GRCh38_plus_tRNAs.ordered_cca.fa > GRCh38_plus_tRNAs.ordered_cca_ref.fa
+
+fastareformat GRCh38_plus_tRNAs.fa > GRCh38_plus_tRNAs.fa.tmp
+mv GRCh38_plus_tRNAs.fa.tmp GRCh38_plus_tRNAs.fa
 
 # compress for transfer to HPC
 pigz -8 GRCh38_plus_tRNAs.fa
