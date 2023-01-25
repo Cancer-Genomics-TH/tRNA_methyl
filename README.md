@@ -2,6 +2,8 @@
 
 Code for the heat map plot in: "Global and single nucleotide resolution detection of 7-methylguanosine in RNA"
 
+Branch using genome hg38 and without spliced tRNAs included (sequences used for mapping)
+
 ## Info
 
 Scripts and data sources to map and analyse methylated tRNAs using NGS data.
