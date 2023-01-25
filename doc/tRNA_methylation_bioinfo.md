@@ -43,7 +43,50 @@ For a successful and timely analysis we used computing cluster managed using SLU
 While vast majority of the steps can be performed on a mainstream workstation creation of the genomic database for LAST and fastq mapping should be done on machines with > 32G RAM.
 
 
-## genome and annotation
+## genome and tRNAs
+
+### T2T genome assembly
+
+```
+# download
+wget https://s3-us-west-2.amazonaws.com/human-pangenomics/T2T/CHM13/assemblies/analysis_
+set/chm13v2.0.fa.gz
+
+# decompress and fix chromosome names
+
+pigz -d --stdout chm13v2.0.fa.gz | sed 's/^>chr/>/g; s/^>M/>MT/' > chm13v2.0.no_chr
+.fa
+```
+
+### mature tRNAs
+```
+wget http://gtrnadb.ucsc.edu/genomes/eukaryota/Hsapi38/hg38-mature-tRNAs.fa
+
+sed '/^>/s/Homo_sapiens_//g; /^>/s/tRNAscan-SE ID: //g ;/^>/!s/U/T/g' hg38-mature-t
+RNAs.fa 
+
+```
+
+### tRNAscan-SE predictions
+
+
+* create region files for chromosomes/MT extraction
+``` 
+rg -v '^MT' chm13v2.0.no_chr.fa.fai | awk '{print $1":1-"$2}' > chrom_1-22,XY.extract.
+list
+
+rg '^MT' chm13v2.0.no_chr.fa.fai | awk '{print $1":1-"$2}' > chrom_MT.extract.list
+```
+
+* extract 24 chromosomes and MT to separate fasta files
+
+```
+samtools faidx chm13v2.0.no_chr.fa --region-file chrom_MT.extract.list > MT.fa
+
+samtools faidx chm13v2.0.no_chr.fa --region-file chrom_1-22,XY.extract.list > chrom
+_1-22,XY.fa
+
+```
 
 ### Gencode 
 
