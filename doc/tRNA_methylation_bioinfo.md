@@ -88,6 +88,27 @@ _1-22,XY.fa
 
 ```
 
+* run tRNAscan
+
+```
+tRNAscan-SE --threads 16 \
+--detail \
+--output chm13_2.0.no_chr.trnas.out \
+--bed chm13_2.0.no_chr.trnas.bed \
+--fasta chm13_2.0.no_chr.trnas.fa \
+--log chm13_2.0.no_chr.trnas.log chm13_2.0.no_chr.fa
+```
+
+```
+tRNAscan-SE --threads 2 \
+--detail \
+-M mammal \
+--output MT_.trnas.out \
+--bed MT.trnas.bed \
+--fasta MT.trnas.fa \
+--log MT.trnas.log chr_MT.fa
+```
+
 ### Gencode 
 
 Release used: 40 
