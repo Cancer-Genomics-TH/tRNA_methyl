@@ -44,7 +44,7 @@ Mapping is done using a strict mapper (```LAST```). Only the top hits are retain
 
 ```mermaid
 graph TD
-    genome_for_mapping{masked T2T genome with separate unique tRNAs}-->|lastdb|last_database[LAST database]
+    genome_for_mapping[masked T2T genome with separate unique tRNAs]-->|lastdb|last_database[LAST database]
     input_fastq[FASTQ file] --> |reads clustering| clustered_fastq[clustered FASTQ]
     clustered_fastq --> |QC, adaptor filtereing| fastped_fastq[clustered FASTQ, adaptors removed ]
     fastped_fastq -->|lastal mapping|maf_result[mapping result MAF file]
