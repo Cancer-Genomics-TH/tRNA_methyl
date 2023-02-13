@@ -1,21 +1,40 @@
 # bioinformatics workflow
 
 
+## genome and tRNAs for mapping
+
 ```mermaid
 graph TD
 
-    genome_fasta{ GRCh38.13 genome} -->|fix names| fasta_names_fix[fasta with chr names: 1,23, etc]
-    gencode_gtf{GENCODE annotation} -->|extract chromosomal tRNA genes/Pseudogenes| chromo_gtf[GTF with tRNAs from chromosomes]
-    ensembl_gtf{ENSEMBL annotation} -->|extract mitochondrial tRNA genes| mito_gtf[GTF with tRNAs from MT]
-    chromo_gtf -->|cat|combo_gtf[combined GTF tRNA genes annotation]
-    mito_gtf -->|cat|combo_gtf
-    fasta_names_fix -->|bedtools masking|masked_genome[fasta with masked tRNA/Pseudo tRNA genes]
-    combo_gtf -->|bedtools masking|masked_genome
-    fasta_names_fix-->|bedtools fasta extract|trna_seq[fasta with all tRNA/pseudo tRNA sequences]
-    combo_gtf -->|bedtools fasta extract|trna_seq
-    trna_seq-->|usearch clustering|unique_trnas_seq[fasta with unique tRNA/pseudo-tRNA sequences]
-    unique_trnas_seq-->|cat|genome_for_mapping[fasta used for mapping]
-    masked_genome-->|cat|genome_for_mapping
+    genome_fasta{ T2T v2.0 genome} -->|fix names| fasta_names_fix[fasta with chr names: 1-22,X,Y and MT]
+    fasta_names_fix --> |extract chromosomes 1-22,X,Y| genome_chromosomes[genome fasta, no MT]
+    fasta_names_fix --> |extract MT| genome_mt[mitochondrial sequence MT only]
+    genome_chromosomes --> |tRNAscan SE predictions genomic | trna_predicted_genomic_fa[predicted tRNAs genomic fasta]
+    genome_chromosomes --> |tRNAscan SE predictions genomic | trna_predicted_genomic_bed[predicted tRNAs genomic BED]
+    genome_mt --> |tRNAscan-SE predictions MT | trna_predicted_mt_fa[predicted tRNAs MT fasta]
+    genome_mt --> |tRNAscan-SE predictions MT | trna_predicted_mt_bed[predicted tRNAs MT BED]
+    trna_predicted_genomic_bed --> |combine predictions BEDs| predicted_trnas_all[predicted tRNAs genomic and MT BED]
+    trna_predicted_mt_bed --> |combine predictions BEDs| predicted_trnas_all[predicted tRNAs genomic and MT BED]
+    fasta_names_fix --> |bedtools masking|masked_genome[fasta with masked tRNA/Pseudo tRNA genes]
+    trna_predicted_genomic_fa -->|merge fasta| trna_predicted_all[T2T predicted tRNAs all]
+    trna_predicted_mt_fa --> |merge fasta| trna_predicted_all[T2T predicted tRNAs all]
+    predicted_trnas_all --> |bedtools masking|masked_genome[fasta with masked tRNA/Pseudo tRNA genes]
+    trna_predicted_all --> |fix tRNA names and sort| trna_predicted_all_name_fixed[T2T predicted tRNAs all with gtRNAdb-like naming scheme ordered by name]
+    gtRNAdb --> |download|mature_trnas_gtrnadb_fa[gtRNAdb hg38 mature tRNAs]
+    mature_trnas_gtrnadb_fa --> |fix tRNA names| mature_trnas_gtrnadb_name_fixed_fa[gtRNAdb hg38 mature tRNAs no Homo_sapiens prefix]  
+    mature_trnas_gtrnadb_name_fixed_fa --> |combine fasta | trna_superset[superset of tRNA sequences]
+    trna_predicted_all_name_fixed -->  |combine fasta | trna_superset[superset of tRNA sequences] 
+    trna_superset -->  |vsearch clustering|unique_trnas_seq[fasta with unique tRNA/pseudo-tRNA sequences]
+    unique_trnas_seq --> | sort by name and add CCA to 3prime | unique_trnas_cca_seq[fasta with unique tRNA/pseudo-tRNA sequences with added 3prime CAA]
+    masked_genome --> |merge fasta | masked_genome_trnas[masked T2T genome with separate unique tRNAs]
+    unique_trnas_cca_seq --> |merge fasta | masked_genome_trnas[masked T2T genome with separate unique tRNAs]
+    masked_genome_trnas --> | index fasta | masked_genome_trnas_fai[T2T genome plus tRNAs  index]
+```
+## FASTQ mapping
+
+draft FIXME
+
+```
     genome_for_mapping-->|lastdb|last_database[LAST database]
     clumped_fastped_masked_fastq-->|lastal|maf_result[mapping result MAF file]
     last_database-->|lastall|maf_result
@@ -23,7 +42,7 @@ graph TD
     unique_trnas_seq_names-->|ripgrep, maf_2_fa_with_counts.py|trna_matches_with_counts[fasta with fastq-derived tRNA seq matches with counts] 
     maf_result-->|ripgrep, maf_2_fa_with_counts.py|trna_matches_with_counts
     gtRNAdb{gtRNAdb aligment}-->|download|html_aligment[html page with human tRNA aligments]
-    html_aligment-->|ripgrep, tab_gtrna_to_stockholm.py|stockholm_align[text file with human tRNAs alihments in Stockholm format]
+    html_aligment-->|ripgrep, tab_gtrna_to_stockholm.py|stockholm_align[text file with human tRNAs aligments in Stockholm format]
     stockholm_align-->|Infernal tools|cmscan_files[files for cmscan searches]
     cmscan_files-->|cmscan|cmscan_mapping_result[tabular mapping results]
     trna_matches_with_counts-->|cmscan|cmscan_mapping_result
