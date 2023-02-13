@@ -49,6 +49,8 @@ graph TD
     clustered_fastq --> |QC, adaptor filtereing| fastped_fastq[clustered FASTQ, adaptors removed ]
     fastped_fastq -->|lastal mapping|maf_result[mapping result MAF file]
     last_database -->|lastall mapping|maf_result
+    maf_result --> |convert to BAM, sort and index| bam_result[mapped results BAM]
+    bam_result --> |visual QC in IGV| igv_screen_shots[IGV view mappings]
 ```
 
 
