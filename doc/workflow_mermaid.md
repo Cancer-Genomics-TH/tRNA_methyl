@@ -38,12 +38,23 @@ graph TD
 ```
 ## FASTQ mapping
 
-We use T2T v2.0 genomic sequence 
+We use the constructed as described above artificial genome to map short RNA NGS sequences. Reads in the input FASTQ files are clustered by sequence, then pre-processed using ```fastp```
+removing adaptor sequences. 
+Mapping is done using a strict mapper (```LAST```). Only the top hits are retained.
+
+```mermaid
+graph TD
+    genome_for_mapping{masked T2T genome with separate unique tRNAs}-->|lastdb|last_database[LAST database]
+    input_fastq[FASTQ file] --> |reads clustering| clustered_fastq[clustered FASTQ]
+    clustered_fastq --> |QC, adaptor filtereing| fastped_fastq[clusteredFASTQ, adaptors removed ]
+    clumped_fastped_masked_fastq-->|lastal mapping|maf_result[mapping result MAF file]
+    last_database-->|lastall|maf_result
+```
+
+
+## parsing mappings
 
 ```
-    genome_for_mapping-->|lastdb|last_database[LAST database]
-    clumped_fastped_masked_fastq-->|lastal|maf_result[mapping result MAF file]
-    last_database-->|lastall|maf_result
     unique_trnas_seq-->|ripgrep,sed|unique_trnas_seq_names[text file with unique by sequence tRNAs names]
     unique_trnas_seq_names-->|ripgrep, maf_2_fa_with_counts.py|trna_matches_with_counts[fasta with fastq-derived tRNA seq matches with counts] 
     maf_result-->|ripgrep, maf_2_fa_with_counts.py|trna_matches_with_counts
