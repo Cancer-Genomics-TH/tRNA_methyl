@@ -3,6 +3,12 @@
 
 ## genome and tRNAs for mapping
 
+We use T2T v2.0 genomic sequence to predict tRNAs using tRNAscan-SE. Predicted tRNAs are masked in the genomic sequence. 
+Since the predictions do not provide us with information about tRNA splicing, we combine our predicted tRNA sequences with mature tRNAs from gtRNAdb.
+Identical (100% identity) sequences are removed using vsearch.
+To increase size of mappable tRNA sequences we add CCA to the 3 prime ends of all tRNAs in the set.  
+Finally we combine  T2T contigs with masked tRNAs with the above super set of mature and predicted unique tRNA sequences.
+
 ```mermaid
 graph TD
 
@@ -32,7 +38,7 @@ graph TD
 ```
 ## FASTQ mapping
 
-draft FIXME
+We use T2T v2.0 genomic sequence 
 
 ```
     genome_for_mapping-->|lastdb|last_database[LAST database]
