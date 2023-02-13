@@ -1,10 +1,12 @@
 # tRNA_methyl
 
-Code for the heat map plot in: "Global and single nucleotide resolution detection of 7-methylguanosine in RNA"
+Bioinformatics workflow and code for the article:
+"Global and single nucleotide resolution detection of 7-methylguanosine in RNA"
+
 
 ## Info
 
-Scripts and data sources to map and analyse methylated tRNAs using NGS data.
+Scripts and data sources to map and analyse methylated tRNAs using NGS data.  Improved ananlysis using T2T veer 2.0 genome assembly, tRNAscan-SE and spliced tRNAs
 
 Contains the description of the data processing steps, file locations and the scripts.
 
