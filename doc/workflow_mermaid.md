@@ -48,27 +48,40 @@ graph TD
     input_fastq[FASTQ file] --> |reads clustering| clustered_fastq[clustered FASTQ]
     clustered_fastq --> |QC, adaptor filtereing| fastped_fastq[clustered FASTQ, adaptors removed ]
     fastped_fastq -->|lastal mapping|maf_result[mapping result MAF file]
-    last_database -->|lastall mapping|maf_result
+    last_database -->|lastal mapping|maf_result
     maf_result --> |convert to BAM, sort and index| bam_result[mapped results BAM]
     bam_result --> |visual QC in IGV| igv_screen_shots[IGV view mappings]
 ```
 
+# preparing tRNA isoforms aligments for cmscan
 
-## parsing mappings
+The source of the alignments is a HTML page from gtRNAdb (hg38 tRNAs)
 
+```mermaid
+graph TD
+
+ html_aligment[gtRNAdb html page] --> |parse_gtrnadb_alignments.ipynb|stockholm_align[text file with human tRNAs aligments in Stockholm format]
+stockholm_align -->|cmbuild from Infernal |cm_file[cm format alingment]
+cm_file --> |cmcalibrate from Infernal |cm_files_calibrated[files for cmscan searches]
+```
+
+## parsing NGS mappings
+
+FIXME
 ```
     unique_trnas_seq-->|ripgrep,sed|unique_trnas_seq_names[text file with unique by sequence tRNAs names]
     unique_trnas_seq_names-->|ripgrep, maf_2_fa_with_counts.py|trna_matches_with_counts[fasta with fastq-derived tRNA seq matches with counts] 
     maf_result-->|ripgrep, maf_2_fa_with_counts.py|trna_matches_with_counts
-    gtRNAdb{gtRNAdb aligment}-->|download|html_aligment[html page with human tRNA aligments]
-    html_aligment-->|ripgrep, tab_gtrna_to_stockholm.py|stockholm_align[text file with human tRNAs aligments in Stockholm format]
-    stockholm_align-->|Infernal tools|cmscan_files[files for cmscan searches]
+    
+```
+
+## getting mapping positions using Infernal
+
+FIXME 
+```
     cmscan_files-->|cmscan|cmscan_mapping_result[tabular mapping results]
     trna_matches_with_counts-->|cmscan|cmscan_mapping_result
     cmscan_mapping_result-->|top hits selection|cmscan_top_hits[TSV file with top hits and their positions]
     cmscan_top_hits-->|normalize coverage and plot|heat_maps[heat maps]
-    fastq{fastq input} -->|clumpify| clumped_fastq(fastq minus optical replicates, clustered reads)
-    clumped_fastq -->|fastp| clumped_fastped_fastq[fastq minus low complexity reads]
-    clumped_fastped_fastq -->|fqgrep, batch_fqgrep.py script|clumped_fastped_masked_fastq[fastq with masked primer sequences]
-    
+
 ```
