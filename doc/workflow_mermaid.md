@@ -55,14 +55,19 @@ graph TD
 
 # preparing tRNA isoforms aligments for cmscan
 
-The source of the alignments is a HTML page from gtRNAdb (hg38 tRNAs)
+The primary source of the alignments is a HTML page from gtRNAdb (hg38 tRNAs). Aligments for the spliced tRNAs (tRNA-Arg-TCT
+tRNA-Ile-TAT, tRNA-Leu-CAA, tRNA-Tyr-ATA, tRNA-Tyr-GTA) were created using mlocarna from LocaRNA.
 
 ```mermaid
 graph TD
 
- html_aligment[gtRNAdb html page] --> |parse_gtrnadb_alignments.ipynb|stockholm_align[text file with human tRNAs aligments in Stockholm format]
-stockholm_align -->|cmbuild from Infernal |cm_file[cm format alingment]
-cm_file --> |cmcalibrate from Infernal |cm_files_calibrated[files for cmscan searches]
+html_aligment[gtRNAdb html page] --> |parse_gtrnadb_alignments.ipynb|stockholm_align_A[text file with human tRNAs aligments in Stockholm format]
+spliced_trnas[spliced tRNAs fasta files] --> |mlocarna alignment| spliced_sto_files[text files with human spliced tRNAs ]
+stockholm_align_A --> |concatenate | stockholm_align_all[superset of spliced and unspliced alignments]
+spliced_sto_files --> |concatenate | stockholm_align_all[superset of spliced and unspliced alignments]
+stockholm_align_all -->|cmbuild from Infernal |cm_file[cm format alingment]
+cm_file --> |cmcalibrate from Infernal |cm_calibrated[files for cmscan searches]
+cm_calibrated --> |cmpress |cm_files[files for cmscan searches]
 ```
 
 ## parsing NGS mappings
