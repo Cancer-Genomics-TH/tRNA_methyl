@@ -72,7 +72,12 @@ cm_calibrated --> |cmpress |cm_files[files for cmscan searches]
 
 ## parsing NGS mappings
 
-FIXME
+Objective: extract mappings to mature non-mitochondrial, non-psedogenes tRNAs.
+
+Since short fragment reads can map to often nearly tRNA sequences we filter out reads mapping to pseudogenes/MT tRNAs to obtain reliable read assigments.  
+Reads with mapping quality (MAPQ) zero are also dropped.
+
+
 ```
     unique_trnas_seq-->|ripgrep,sed|unique_trnas_seq_names[text file with unique by sequence tRNAs names]
     unique_trnas_seq_names-->|ripgrep, maf_2_fa_with_counts.py|trna_matches_with_counts[fasta with fastq-derived tRNA seq matches with counts] 
