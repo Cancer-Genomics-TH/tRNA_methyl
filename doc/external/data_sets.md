@@ -5,7 +5,7 @@
 
 ### data
 
-* human hepatocellular carcinoma cell line
+* human hepatocellular carcinoma cell line MHCC97H (Chinese male 39yo)
 * NextSeq 500 Illumina
 * read length: 75bp
 
