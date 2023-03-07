@@ -97,7 +97,7 @@ conda install -c bioconda seqtk
 
 ### fastp
 
-Fastq quality checking, low complecity reads filtering
+Fastq quality checking, low complexity reads filtering
 
 * www: 
 * version: 0.23.2
