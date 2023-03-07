@@ -1,20 +1,27 @@
 # Software
 
 
-- [aligners/mappers](#aligners-mappers)
-  * [LAST mapper](#last-mapper)
-  * [Infernal](#infernal)
-- [general tools](#general-tools)
-  * [bedtools](#bedtools)
-  * [clumpify from BBMap](#clumpify-from-bbmap)
-  * [fastp](#fastp)
-  * [```usearch```](#---usearch---)
-  * [```fqgrep```](#---fqgrep---)
-- [system utils](#system-utils)
-  * [```ripgrep```](#---ripgrep---)
-  * [```choose```](#---choose---)
-  * [pigz](#pigz)
-  * [fish shell](#fish-shell)
+- [Software](#software)
+  - [aligners/mappers](#alignersmappers)
+    - [LAST mapper](#last-mapper)
+    - [Infernal](#infernal)
+  - [general tools](#general-tools)
+    - [aws-cli](#aws-cli)
+    - [```seqtk```](#seqtk)
+    - [bedtools](#bedtools)
+    - [clumpify from BBMap](#clumpify-from-bbmap)
+    - [fastp](#fastp)
+    - [```vsearch```](#vsearch)
+    - [```fqgrep```](#fqgrep)
+  - [system utils](#system-utils)
+    - [```ripgrep```](#ripgrep)
+    - [```choose```](#choose)
+    - [pigz](#pigz)
+    - [fish shell](#fish-shell)
+    - [```pypy3```](#pypy3)
+    - [python libraries](#python-libraries)
+      - [main scripts](#main-scripts)
+      - [extras](#extras)
 
 <small><i><a href='http://ecotrust-canada.github.io/markdown-toc/'>Table of contents generated with markdown-toc</a></i></small>
 
@@ -28,9 +35,15 @@ Used to map fastq files to the genome
 
 * www:  https://gitlab.com/mcfrith/last
 * docs: https://gitlab.com/mcfrith/last/-/tree/main/doc
-* version: 1281 
-* obtained from: https://gitlab.com/mcfrith/last/-/archive/1281/last-1281.tar.gz
-* installation: compiled from source
+* version: 1418 
+* obtained from: https://anaconda.org/bioconda/last
+* installation: 
+
+```
+conda create --name last
+conda activate last
+conda install -c bioconda last
+```
 
 
 ### Infernal
@@ -45,6 +58,27 @@ Used to map tRNA fragments to human tRNAs profiles
 
 
 ## general tools
+
+### aws-cli
+
+* purpose: fast T2T genome download
+* version: 2.9.13
+* obtained from: https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html#cliv2-linux-install
+* installation: follow the instruuctions from the pageabove
+
+### ```seqtk```
+
+* purpose: sequence reformat
+* version: 1.3
+* obtained from: https://anaconda.org/bioconda/seqtk
+* installation: 
+
+```
+conda create --name seqtk
+conda activate seqtk
+conda install -c bioconda seqtk
+```
+
 
 ### bedtools 
 
@@ -78,11 +112,17 @@ conda install -c bioconda fastp
 
 
 
-### ```usearch```
+### ```vsearch```
 
-* version: usearch11.0.667_i86linux32
-* obtained from: https://drive5.com/downloads/usearch11.0.667_i86linux32.gz
-* installation: static binary
+* version: 2.22.1
+* obtained from: https://anaconda.org/bioconda/vsearch
+* installation: 
+
+```
+conda create --name vsearch
+conda activate vsearch
+conda install -c bioconda vsearch
+```
 
 ### ```fqgrep```
 
@@ -95,7 +135,7 @@ conda install -c bioconda fastp
 
 ## system utils
 
-This is a set of command line tools used for speed/convinience. One can  
+This is a set of command line tools used for speed/convinience. 
 
 
 ### ```ripgrep```
@@ -147,12 +187,11 @@ Faster Python implementation
 Installed using ```pip```
 
 #### main scripts
+* polars
 * pyfaidx
 * numpy
 * pandas
 * seaborn
-
+  
 #### extras
 * executor
-
-
