@@ -241,6 +241,35 @@ cat $genome_trna_masked_fa $combined_uniq_trnas_fa > $genome_for_mapping
 """
 }
 
+process lastdb {
+publishDir './genome', mode: 'copy', overwrite: false
+
+   executor 'slurm'
+  queue 'mem'
+  cpus 32 
+  time '3h'
+  conda "/scratch/dkedra/.conda/envs/last_aligner"
+
+input:
+  path genome_for_mapping
+
+output:
+  tuple val(lastdb_prefix) , path("lastdb")
+  
+  script:
+    lastdb_prefix = "t2t_trnas.last_soft"
+    //lastdb_glob =  "t2t_trnas.last.*"
+
+"""
+mkdir lastdb
+lastdb   -P32 \
+-uNEAR -v -c \
+./lastdb/$lastdb_prefix $genome_for_mapping
+
+"""
+
+}
+
 workflow {
 
   genome_fa_ch = Channel.fromPath("./genome/chm13_2.0.fa") .ifEmpty('download_fasta()').view() 
@@ -255,7 +284,8 @@ workflow {
 
  combine_trnascan_fa(rna_scan_mt_ch, rna_scan_chr_ch)
  combine_mature_trnascan_fa( download_mature_trnas.out,  combine_trnascan_fa.out)
- final_genome(bed_mask.out, combine_mature_trnascan_fa.out)
+final_genome(bed_mask.out, combine_mature_trnascan_fa.out)
+lastdb(final_genome.out)
 
 
 }
