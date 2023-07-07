@@ -10,6 +10,7 @@ Apart from that it uses few command line utils for speed/ease of use:
 And Python libraries:
 
 * executor
+* polars
 * pyfaidx
 * xxhash
 
