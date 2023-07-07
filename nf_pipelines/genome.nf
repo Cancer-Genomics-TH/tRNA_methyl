@@ -1,3 +1,11 @@
+/*--------------------------------------------------
+    *  t2t_trnas pipeline step_1
+    *  Nextflow pipeline for constructing artificial genome using human T2T assembly, trnascan-SE predictions and gtRNAdb mature tRNAs (hg38)
+    *  uses awscli; samtools, trnascan-SE  bedtools  LAST aligner 
+    *  other utils: pypy, ripgrep (rg), hck 
+---------------------------------------------------*/
+
+
 nextflow.enable.dsl=2
 debug=true
 
