@@ -1,16 +1,21 @@
 #!/usr/bin/env python3
 
 # coding: utf-8
-# # Notebook to parse tRNA alignments from HTML page gtRNAdb
-# 
-# working version
-# requires manual editing/removing of a duplicate ```RZ9990_NCA_HUMAN``` entry at the end of the file
-# output: hs38_gtrnadb_algn_01.sto
+
+""" 
+env:
+/scratch/dkedra/.conda/envs/python_310/lib/python3.10/
+
+working version
+
+downloads tRNA aligments as HTML from gtRNAdb
+converts them to Stockholm format
+
+output: hs38_gtrnadb_algn_01.sto
+""" 
 
 
-
-
-
+import executor
 import requests
 import sys
 
@@ -21,7 +26,7 @@ from bs4 import BeautifulSoup
 
 url = "http://gtrnadb.ucsc.edu/genomes/eukaryota/Hsapi38/Hsapi38-align.html"
 
-out_stockholm_fn = "hs38_gtrnadb_algn_01.sto"
+out_stockholm_fn = "trnas_hs38_gtrnadb_fromhtml.sto"
 
 align_header = "# STOCKHOLM 1.0"
 
@@ -70,7 +75,7 @@ def parse_seq_alignments(alg_list):
     print("//")    
 
 def output_stockholm(alig_list):
-
+    
     saveout = sys.stdout
     output_fh = open(out_stockholm_fn, "w")
     sys.stdout = output_fh
@@ -79,6 +84,11 @@ def output_stockholm(alig_list):
 
     sys.stdout = saveout
     output_fh.close()
+    #remove repeated lines
+    command_1 = f"""cat {out_stockholm_fn} | uniq > {out_stockholm_fn}.tmp"""
+    executor.execute(command_1)
+    command_2 = f"""mv {out_stockholm_fn}.tmp {out_stockholm_fn}"""
+    executor.execute(command_2)
 
 
 if __name__ == "__main__":
