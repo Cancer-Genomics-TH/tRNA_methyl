@@ -11,6 +11,7 @@ debug=true
 
 params.genome_s3 = "s3://human-pangenomics/T2T/CHM13/assemblies/chm13v2.0.fa"
 params.gtrnadb_mature_trnas = "http://gtrnadb.ucsc.edu/genomes/eukaryota/Hsapi38/hg38-mature-tRNAs.fa"
+params.gtrnadb_confident_trnas = "http://gtrnadb.ucsc.edu/genomes/eukaryota/Hsapi38/hg38-tRNAs.fa"
 
 process download_fasta {
 
@@ -163,7 +164,7 @@ process bed_mask {
 }
 
 
-process download_mature_trnas {
+process download_gtrnadb_fastas {
   // download mature tRNAs from UCSC and convert to fasta format
   // add CCA tail
   // script uses pypy to speed up the conversion
@@ -185,12 +186,18 @@ process download_mature_trnas {
     gtrnadb_mature_trnas_fa = "gtrnadb_mature_trnas.fa"
   
     """
-    wget -O tmp_A_fa ${params.gtrnadb_mature_trnas} 
-    sed '/^>/ s/Homo_sapiens_//g' tmp_A_fa | sed '/^>/! s/U/T/g' > tmp_B_fa
-    $baseDir/bin/trna_add_CCA.py  tmp_B_fa >  $gtrnadb_mature_trnas_fa
+    wget ${params.gtrnadb_mature_trnas}
+    wget ${params.gtrnadb_confident_trnas}
+    
+    sed -i '/^>/! s/U/T/g' hg38-mature-tRNAs.fa
+    
+    $baseDir/bin/reformat_combine_gtRNAdb_fa.py > tmp_A_fa
+    
+    $baseDir/bin/sort_trnas.py  tmp_A_fa >  $gtrnadb_mature_trnas_fa
 
   """
 }
+
 
 process combine_trnascan_fa {
 

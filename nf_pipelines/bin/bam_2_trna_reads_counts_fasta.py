@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 """
-converts mappings to selected tRNA contigsfrom a bam file to a fasta file with counts
+converts mappings to selected tRNA contigs from a bam file to a fasta file with counts
 """
 
 import io
