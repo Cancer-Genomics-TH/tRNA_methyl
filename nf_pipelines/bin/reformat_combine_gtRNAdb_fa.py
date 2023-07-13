@@ -1,6 +1,9 @@
 #!/usr/bin/env pypy3
 
 """
+combines confident and mature tRNA fasta files from gtRNAdb
+adds CCA tail to all tRNAs
+adds .intron (confident set) or .spld (mature) to spliced tRNA names
 
 """
 
