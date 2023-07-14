@@ -88,6 +88,9 @@ process clump {
 
 process lastal_map {
 
+  // mapping FASTQ file to t2t_trnas.last_soft database
+  // 
+
   executor 'slurm'
   queue 'std'
   cpus 16 // depending on the IO on the cluster(?) one can use 16 threads instead
@@ -96,7 +99,7 @@ process lastal_map {
 
   publishDir './results_fq/',  mode: "copy", pattern: "*.maf.gz"
 
-  //module load conda
+  
   conda  "/scratch/dkedra/.conda/envs/last_aligner"
 
   input:
@@ -110,8 +113,9 @@ process lastal_map {
     result_maf_gz = fn_prefix + ".t2t_trnas.maf.gz"
 
     """
-    lastal -v -P12  -Qkeep  -C2  ${lastdb}  $fq_fn \
-    | last-split \
+    pigz -d -c $fq_fn | last-train -P12 -Q1 ${lastdb} > fq_train_last
+    
+    lastal -v -P12  -Qkeep  -C2 --split -p fq_train_last ${lastdb}  $fq_fn \
     | pigz -4 --processes 4 > $result_maf_gz
     """
 }
