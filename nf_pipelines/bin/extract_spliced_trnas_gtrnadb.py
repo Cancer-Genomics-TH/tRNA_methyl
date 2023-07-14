@@ -5,8 +5,12 @@
 env:
 /scratch/dkedra/.conda/envs/python_310/
 
+naming scheme: spld-Tyr-GTA-2-1
 
-spld-Tyr-GTA-2-1
+next step: files are used as input for mlocarna alignment
+
+caveat: 
+spld-Tyr-ATA is exception, because it has just one sequence 
 
 """
 
