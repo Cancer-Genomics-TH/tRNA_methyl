@@ -3,10 +3,10 @@
 # coding: utf-8
 
 """ 
-env:
+alternative env:
 /scratch/dkedra/.conda/envs/python_310/
 
-working version
+working pipeline version
 
 downloads tRNA aligments as HTML from gtRNAdb
 converts them to Stockholm format
@@ -90,8 +90,6 @@ def output_stockholm(alig_list):
     executor.execute(command_1)
     command_2 = f"""mv {out_stockholm_fn}.tmp {out_stockholm_fn}"""
     executor.execute(command_2)
-
-  
 
 if __name__ == "__main__":
     
