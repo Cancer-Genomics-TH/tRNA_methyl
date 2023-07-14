@@ -1,8 +1,16 @@
-#!/usr/bin/env python3
+#!/usr/bin/env pypy3
 
 
 """
-spld-Tyr-GTA-2-1
+extracts spliced isotypes from gtrnadb mature tRNAs fasta file
+one isotype => one fasta file
+
+naming scheme: spld-Tyr-GTA-2-1
+
+next step: files are used as input for mlocarna alignment
+
+caveat: 
+spld-Tyr-ATA is exception, because it has just one sequence 
 
 """
 
@@ -11,36 +19,6 @@ import sys
 import textwrap
 
 from pyfaidx import Fasta
-
-"""
-    
-            print(tmp_list, isotype)
-            
-            if spliced_flag == "intron":
-                if isotype in spliced_trnas:
-                    new_name = new_name + ".intron"
-                fix_seq(record, new_name)
-            elif spliced_flag == "spld":
-                if isotype in spliced_trnas:
-                    new_name = new_name + ".spld"
-                    fix_seq(record, new_name)    
-                else:
-                    #new_name = new_name + ".discard"
-                    pass
-            else:
-                print("wrong flag", spliced_flag)
-
-
-                isotype_fasta = f"{isotype}.fa"
-                print(isotype_fasta, isotype)
-
-                saveout = sys.stdout
-                with open(isotype_fasta, "w") as output_fh:
-                    sys.stdout = output_fh
-
-"""
-
-
 
 
 def parse_gtrnadb_fa(fasta_in):
@@ -65,7 +43,7 @@ def parse_gtrnadb_fa(fasta_in):
     print(isotypes_dict)
     print(isotypes_dict.keys())
     for spliced_isotype in isotypes_dict.keys():
-        isotype_fasta = f"{spliced_isotype}.fa"
+        isotype_fasta = f"tRNA-{spliced_isotype}.fa"
         print(isotype_fasta, spliced_isotype)
 
         saveout = sys.stdout
@@ -84,9 +62,8 @@ def parse_gtrnadb_fa(fasta_in):
         
 
 if __name__ == "__main__":
-     
-     in_fa = sys.argv[1]
-     parse_gtrnadb_fa(in_fa)
+    in_fa = sys.argv[1]
+    parse_gtrnadb_fa(in_fa)
 
 
 
