@@ -16,7 +16,7 @@ process trna_only_bam {
 
   //publishDir '$baseDir/results_filtering',  mode: "copy", pattern: "*.list"
 
-  conda  "/scratch/dkedra/.conda/envs/samtools"
+  conda  "/scratch/dkedra/.conda/envs/samtools/"
 
   input:
     tuple val(sample_id), path(bam_bai_pairs_list)
@@ -47,7 +47,7 @@ process reads_in_flanks {
 
   //publishDir '$baseDir/results_filtering',  mode: "copy", pattern: "*.list"
 
-  conda  "/scratch/dkedra/.conda/envs/samtools"
+  conda  "/scratch/dkedra/.conda/envs/samtools/"
 
 
 input:
@@ -78,7 +78,7 @@ executor 'slurm'
   time '60m'
 
   publishDir './results/',  mode: "copy", pattern: "*.bam*"
-  conda  "/scratch/dkedra/.conda/envs/samtools"
+  conda  "/scratch/dkedra/.conda/envs/samtools/"
   
   input:
     tuple val(sample_prefix), path(reads_in_flanks), path(trna_only_bam), path(trna_only_bam_bai)
@@ -114,7 +114,7 @@ executor 'slurm'
   cpus 4 
   time '60m'
 
-  conda  "/scratch/dkedra/.conda/envs/samtools"
+  conda  "/scratch/dkedra/.conda/envs/samtools/"
 
   input:
     tuple val(sample_prefix), path(filtered_trna_bam), path(filtered_trna_bam_bai)
@@ -138,7 +138,7 @@ process cmscan_trna_profiles {
   cpus 12
   time '60m'
   
-  conda  "/scratch/dkedra/.conda/envs/infernal"
+  conda  "/scratch/dkedra/.conda/envs/infernal/"
 
   input:
     tuple val(sample_prefix), path(matches_fasta)
@@ -165,7 +165,7 @@ process cmscan_top_hits {
   cpus 12
   time '60m'
   
-  conda  "/scratch/dkedra/.conda/envs/pypy_39"
+  conda  "/scratch/dkedra/.conda/envs/pypy_39/"
 
   input:
     tuple val(sample_prefix), path(cmscan_output_tab),  path(cmscan_output)

@@ -17,7 +17,7 @@ process download_fasta {
 
   publishDir './genome', mode: 'copy', overwrite: false
 
-  conda '/scratch/dkedra/.conda/envs/awscli/'
+  conda "/scratch/dkedra/.conda/envs/awscli/"
 
   output:
     path genome_fa
@@ -42,7 +42,7 @@ process index_fasta {
   cpus 1
   time '30m'
 
-  conda '/scratch/dkedra/.conda/envs/samtools/'
+  conda "/scratch/dkedra/.conda/envs/samtools/"
   
   input:
     path genome_fa
@@ -261,7 +261,7 @@ process final_genome{
   cpus 1
   time '30m'
 
-  conda '/scratch/dkedra/.conda/envs/samtools/'
+  conda "/scratch/dkedra/.conda/envs/samtools/"
 
 
   input:
@@ -290,13 +290,13 @@ process lastdb {
   cpus 32
   time '3h'
   
-  conda "/scratch/dkedra/.conda/envs/last_aligner"
+  conda "/scratch/dkedra/.conda/envs/last_aligner/"
 
   input:
     path genome_for_mapping
 
   output:
-    tuple val(lastdb_prefix) , path("lastdb")
+    tuple val(lastdb_prefix), path("lastdb")
 
   script:
     lastdb_prefix = "t2t_trnas.last_soft"

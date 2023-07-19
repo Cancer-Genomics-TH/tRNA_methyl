@@ -100,7 +100,7 @@ process lastal_map {
   publishDir './results_fq/',  mode: "copy", pattern: "*.maf.gz"
 
   
-  conda  "/scratch/dkedra/.conda/envs/last_aligner"
+  conda  "/scratch/dkedra/.conda/envs/last_aligner/"
 
   input:
     path fq_fn
@@ -129,7 +129,7 @@ executor 'slurm'
   time '120m'
 
   publishDir './results_fq/',  mode: "copy", pattern: "*.bam*"
-  conda  "/scratch/dkedra/.conda/envs/last_aligner"
+  conda  "/scratch/dkedra/.conda/envs/last_aligner/"
   
   input:
     tuple val(fn_prefix), path(maf_gz)
@@ -156,7 +156,7 @@ process bam_index {
   time '15m'
 
   publishDir './results_fq/',  mode: "copy", pattern: "*.bam.bai"
-  conda  "/scratch/dkedra/.conda/envs/samtools"
+  conda  "/scratch/dkedra/.conda/envs/samtools/"
   
   input:
     tuple val(fn_prefix), path(bam_fn)
