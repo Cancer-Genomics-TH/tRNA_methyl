@@ -9,7 +9,6 @@ from pyfaidx import Fasta
 from trnascan_out_parser import parse_out
 
 
-
 def split_by_len(txt: str, len: int, sep: str or None = "\n") -> str or list:
     """
     txt: str text
