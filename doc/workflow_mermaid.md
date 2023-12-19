@@ -1,10 +1,25 @@
 # bioinformatics workflow
 
+## overview
+
+To filter out not fully processed tRNA sequences we map FASTQ reads twice: 
+1. to a constructed genome with unique tRNA added as separate contigs
+2. to a regular human genome
+
+We extract read sequences mapping to tRNA contigs from *1* and filter out reads overlapping the tRNAs genomic flanks as determined by mapping *2*. 
 
 ## genome and tRNAs for mapping
 
-We use T2T v2.0 genomic sequence to predict tRNAs using tRNAscan-SE. Predicted tRNAs are masked in the genomic sequence. 
-Since the predictions do not provide us with information about tRNA splicing, we combine our predicted tRNA sequences with mature tRNAs from gtRNAdb.
+To filter out not fully processed tRNA sequences we map FASTQ reads twice: 
+* to a constructed genome with unique tRNA added as separate contigs
+* to a regular human genome
+
+
+
+### constructed genome
+
+We use T2T v2.0 genomic sequence to predict tRNAs using ```tRNAscan-SE```. Predicted tRNAs are masked in the genomic sequence. 
+We extract both spliced and non-spliced tRNA sequences predicted by ```tRNAscan-SE``` and combine these with mature tRNAs from gtRNAdb.
 Identical (100% identity) sequences are removed using vsearch.
 To increase size of mappable tRNA sequences we add CCA to the 3 prime ends of all tRNAs in the set.  
 Finally we combine  T2T contigs with masked tRNAs with the above super set of mature and predicted unique tRNA sequences.
@@ -36,21 +51,48 @@ graph TD
     unique_trnas_cca_seq --> |merge fasta | masked_genome_trnas[masked T2T genome with separate unique tRNAs]
     masked_genome_trnas --> | index fasta | masked_genome_trnas_fai[T2T genome plus tRNAs  index]
 ```
+
+### human genome
+
+```mermaid
+graph TD
+
+    genome_fasta{ T2T v2.0 genome} -->|fix names| t2t_genome[ T2T fasta with chr names: 1-22,X,Y and MT]
+    t2t_genome --> | index fasta | T2T_genome_fai[T2T genome index]
+
+```
+
+
 ## FASTQ mapping
 
 We use the constructed as described above artificial genome to map short RNA NGS sequences. Reads in the input FASTQ files are clustered by sequence, then pre-processed using ```fastp```
 removing adaptor sequences. 
 Mapping is done using a strict mapper (```LAST```). Only the top hits are retained.
 
+### constructed genome
+
 ```mermaid
 graph TD
     genome_for_mapping[masked T2T genome with separate unique tRNAs]-->|lastdb|last_database[LAST database]
     input_fastq[FASTQ file] --> |reads clustering| clustered_fastq[clustered FASTQ]
-    clustered_fastq --> |QC, adaptor filtereing| fastped_fastq[clustered FASTQ, adaptors removed ]
+    clustered_fastq --> |QC, adaptor filtering| fastped_fastq[clustered FASTQ, adaptors removed ]
     fastped_fastq -->|lastal mapping|maf_result[mapping result MAF file]
     last_database -->|lastal mapping|maf_result
     maf_result --> |convert to BAM, sort and index| bam_result[mapped results BAM]
     bam_result --> |visual QC in IGV| igv_screen_shots[IGV view mappings]
+```
+
+### human genome
+
+```mermaid
+graph TD
+   t2t_genome[ T2T fasta with chr names: 1-22,X,Y and MT]-->|lastdb|last_database[T2T LAST database]
+    input_fastq[FASTQ file] --> |reads clustering| clustered_fastq[clustered FASTQ]
+    clustered_fastq --> |QC, adaptor filtering| fastped_fastq[clustered FASTQ, adaptors removed ]
+    fastped_fastq -->|lastal mapping|t2t_maf_result[T2T mapping result MAF file]
+    last_database -->|lastal mapping|t2t_maf_result
+    t2t_maf_result --> |convert to BAM, sort and index| t2t_bam_result[T2T mapped results BAM]
+    t2t_bam_result --> |visual QC in IGV| igv_screen_shots[IGV view mappings]
 ```
 
 # preparing tRNA isoforms aligments for cmscan
