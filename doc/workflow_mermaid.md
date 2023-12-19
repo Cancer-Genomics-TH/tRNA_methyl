@@ -91,10 +91,10 @@ graph TD
 ## getting mapping positions using Infernal
 
 FIXME 
-```
+```mermaid
+graph TD
     cmscan_files-->|cmscan|cmscan_mapping_result[tabular mapping results]
     trna_matches_with_counts-->|cmscan|cmscan_mapping_result
     cmscan_mapping_result-->|top hits selection|cmscan_top_hits[TSV file with top hits and their positions]
     cmscan_top_hits-->|normalize coverage and plot|heat_maps[heat maps]
-
 ```
